@@ -9,22 +9,20 @@ def setup_dspy():
     """
     lm_provider = None
     if all([
-        settings.azure_openai_key,
-        settings.azure_openai_endpoint,
-        settings.azure_openai_deployment_name
+        settings.openai_api_key,
+        settings.openai_api_base,
     ]):
         try:
-            model_path = f"azure/{settings.azure_openai_deployment_name}"
+            model_path = f"openai/{settings.openai_model_name}"
             lm_provider = dspy.LM(
                 model_path,
-                api_key=settings.azure_openai_key,
-                api_base=settings.azure_openai_endpoint,
-                api_version=settings.azure_openai_api_version,
+                api_key=settings.openai_api_key,
+                api_base=settings.openai_api_base,
             )
             print(
-                f"INFO: DSPy configured with dspy.LM for Azure model: {model_path}")
+                f"INFO: DSPy configured with dspy.LM for OpenAI-Compatible model: {model_path}")
         except Exception as e:
-            print(f"WARNING: Azure OpenAI configuration failed: {e}")
+            print(f"WARNING: OpenAI-Compatible API configuration failed: {e}")
     else:
         print("INFO: No LLM provider credentials found. DSPy will not be configured with a language model.")
 

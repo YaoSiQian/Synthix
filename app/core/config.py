@@ -23,12 +23,10 @@ class Settings(BaseSettings):
     pubchem_base_url: str = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
     pubchem_timeout: int = 10
 
-    # DSPy/LLM settings - Azure OpenAI
-    azure_openai_key: Optional[str] = None
-    azure_openai_endpoint: Optional[str] = None
-    azure_openai_api_version: str = "2024-12-01-preview"
-    azure_openai_deployment_name: Optional[str] = None
-    azure_openai_model_name: str = "gpt-4o-mini"
+    # DSPy/LLM settings - OpenAI-Compatible API (works with any OpenAI-compatible provider)
+    openai_api_key: Optional[str] = None
+    openai_api_base: Optional[str] = None
+    openai_model_name: str = "gpt-4o-mini"
 
 
     # Application settings
