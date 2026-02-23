@@ -1,6 +1,8 @@
 services:
   backend:
-    build: .
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
     ports:
       - "8000:8000"
     environment:
@@ -19,6 +21,7 @@ services:
       - OPENAI_MODEL_NAME=gpt-4o-mini
     volumes:
       - ./data:/app/data
+    working_dir: /app
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
