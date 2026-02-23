@@ -11,9 +11,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN useradd --create-home chemezy && chown -R chemezy:chemezy /app
+RUN useradd --create-home chemezy && \
+    mkdir -p /app/data && \
+    chown -R chemezy:chemezy /app && \
+    chmod +x /app/scripts/docker-entrypoint.sh
+
 USER chemezy
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["/app/scripts/docker-entrypoint.sh"]
