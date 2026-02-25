@@ -61,6 +61,14 @@ const RegisterPage: React.FC = () => {
   };
   
   return (
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
     <Card
       sx={{
         width: '100%',
@@ -264,6 +272,7 @@ const RegisterPage: React.FC = () => {
         </Box>
       </CardContent>
     </Card>
+    </Box>
   );
 };
 
