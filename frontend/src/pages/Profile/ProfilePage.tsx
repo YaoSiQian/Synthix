@@ -26,12 +26,14 @@ import {
   Save,
   Cancel,
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { PageLayout } from '@/components/layout';
 import { LoadingSpinner, StatCard } from '@/components/common';
 import { useAuth, useMyRank, useReactionStats } from '@/hooks';
 import { colors } from '@/theme';
 
 const ProfilePage: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { data: myRank } = useMyRank();
   const { data: reactionStats } = useReactionStats();
@@ -57,17 +59,17 @@ const ProfilePage: React.FC = () => {
   
   if (!user) {
     return (
-      <PageLayout title="个人资料">
-        <LoadingSpinner message="加载用户信息..." />
+      <PageLayout title={t('profile.title')}>
+        <LoadingSpinner message={t('common.loading')} />
       </PageLayout>
     );
   }
-  
+
   return (
     <PageLayout
-      title="个人资料"
-      subtitle="管理你的账户信息"
-      breadcrumbs={[{ label: '个人资料' }]}
+      title={t('profile.title')}
+      subtitle={t('profile.settings')}
+      breadcrumbs={[{ label: t('profile.title') }]}
     >
       <Grid container spacing={3}>
         {/* Profile header */}

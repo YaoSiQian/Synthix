@@ -7,6 +7,7 @@ import {
   Chip,
 } from '@mui/material';
 import { EmojiEvents, Lock, TrendingUp } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { PageLayout } from '@/components/layout';
 import { AwardCard } from '@/components/awards';
 import { LoadingSpinner, EmptyState } from '@/components/common';
@@ -14,16 +15,17 @@ import { useMyAwards, useAvailableAwards } from '@/hooks';
 import { colors } from '@/theme';
 import type { AwardCategory } from '@/types';
 
-const categories: Array<{ value: AwardCategory | 'all'; label: string }> = [
-  { value: 'all', label: '全部' },
-  { value: 'discovery', label: '发现' },
-  { value: 'database_contribution', label: '数据库贡献' },
-  { value: 'community', label: '社区' },
-  { value: 'special', label: '特殊' },
-  { value: 'achievement', label: '成就' },
+const categories: Array<{ value: AwardCategory | 'all'; labelKey: string }> = [
+  { value: 'all', labelKey: 'common.all' },
+  { value: 'discovery', labelKey: 'awards.discovery' },
+  { value: 'database_contribution', labelKey: 'awards.database' },
+  { value: 'community', labelKey: 'awards.community' },
+  { value: 'special', labelKey: 'awards.special' },
+  { value: 'achievement', labelKey: 'awards.achievement' },
 ];
 
 const AwardsPage: React.FC = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = React.useState(0);
   const [categoryFilter, setCategoryFilter] = React.useState<AwardCategory | 'all'>('all');
   
@@ -47,9 +49,9 @@ const AwardsPage: React.FC = () => {
   
   return (
     <PageLayout
-      title="奖励系统"
-      subtitle="追踪你的成就和进度"
-      breadcrumbs={[{ label: '奖励' }]}
+      title={t('awards.title')}
+      subtitle={t('awards.progress')}
+      breadcrumbs={[{ label: t('awards.title') }]}
     >
       {/* Main tabs */}
       <Box sx={{ mb: 3 }}>
@@ -67,7 +69,7 @@ const AwardsPage: React.FC = () => {
             label={
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <EmojiEvents />
-                <span>我的奖励</span>
+                <span>{t('awards.myAwards')}</span>
               </Box>
             }
             sx={{ textTransform: 'none', fontWeight: 600 }}
@@ -76,7 +78,7 @@ const AwardsPage: React.FC = () => {
             label={
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Lock />
-                <span>可用奖励</span>
+                <span>{t('awards.allAwards')}</span>
               </Box>
             }
             sx={{ textTransform: 'none', fontWeight: 600 }}
@@ -89,7 +91,7 @@ const AwardsPage: React.FC = () => {
         {categories.map((cat) => (
           <Chip
             key={cat.value}
-            label={cat.label}
+            label={t(cat.labelKey)}
             onClick={() => handleCategoryChange(cat.value)}
             sx={{
               borderRadius: '9999px',
@@ -108,13 +110,13 @@ const AwardsPage: React.FC = () => {
       {isMyAwardsTab && (
         <>
           {myAwardsLoading ? (
-            <LoadingSpinner message="加载奖励..." />
+            <LoadingSpinner message={t('common.loading')} />
           ) : !myAwards || myAwards.length === 0 ? (
             <EmptyState
-              title="暂无奖励"
-              message="完成实验和发现来解锁奖励"
+              title={t('awards.noAwards')}
+              message={t('awards.keepExploring')}
               icon={<EmojiEvents sx={{ fontSize: 64, color: colors.onSurfaceVariant }} />}
-              actionLabel="去实验室"
+              actionLabel={t('nav.lab')}
               onAction={() => window.location.href = '/lab'}
             />
           ) : (

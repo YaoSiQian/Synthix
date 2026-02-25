@@ -11,6 +11,7 @@ import {
   Chip,
 } from '@mui/material';
 import { MilitaryTech, TrendingUp } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { PageLayout } from '@/components/layout';
 import { LeaderboardTable } from '@/components/awards';
 import { LoadingSpinner, EmptyState } from '@/components/common';
@@ -19,16 +20,17 @@ import { useAuth } from '@/hooks';
 import { colors, tierColors, awardCategoryLabels } from '@/theme';
 import type { AwardCategory } from '@/types';
 
-const categories: Array<{ value: AwardCategory | 'overall'; label: string }> = [
-  { value: 'overall', label: '总排行' },
-  { value: 'discovery', label: '发现' },
-  { value: 'database_contribution', label: '数据库贡献' },
-  { value: 'community', label: '社区' },
-  { value: 'special', label: '特殊' },
-  { value: 'achievement', label: '成就' },
+const categories: Array<{ value: AwardCategory | 'overall'; labelKey: string }> = [
+  { value: 'overall', labelKey: 'leaderboard.allTime' },
+  { value: 'discovery', labelKey: 'awards.discovery' },
+  { value: 'database_contribution', labelKey: 'awards.database' },
+  { value: 'community', labelKey: 'awards.community' },
+  { value: 'special', labelKey: 'awards.special' },
+  { value: 'achievement', labelKey: 'awards.achievement' },
 ];
 
 const LeaderboardPage: React.FC = () => {
+  const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = React.useState<AwardCategory | 'overall'>('overall');
   const { user } = useAuth();
   
@@ -43,9 +45,9 @@ const LeaderboardPage: React.FC = () => {
   
   return (
     <PageLayout
-      title="排行榜"
-      subtitle="看看你在社区中的排名"
-      breadcrumbs={[{ label: '排行榜' }]}
+      title={t('leaderboard.title')}
+      subtitle={t('leaderboard.category')}
+      breadcrumbs={[{ label: t('leaderboard.title') }]}
     >
       {/* Category tabs */}
       <Box sx={{ mb: 3 }}>
@@ -67,7 +69,7 @@ const LeaderboardPage: React.FC = () => {
             <Tab
               key={cat.value}
               value={cat.value}
-              label={cat.label}
+              label={t(cat.labelKey)}
               sx={{
                 textTransform: 'none',
                 borderRadius: '9999px',

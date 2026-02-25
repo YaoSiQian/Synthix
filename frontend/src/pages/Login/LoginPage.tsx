@@ -22,18 +22,20 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useLogin } from '@/hooks';
 import { colors } from '@/theme';
 
 const loginSchema = z.object({
-  username: z.string().min(1, '请输入用户名'),
-  password: z.string().min(1, '请输入密码'),
+  username: z.string().min(1, 'validation.usernameRequired'),
+  password: z.string().min(1, 'validation.passwordRequired'),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const loginMutation = useLogin();
   const [showPassword, setShowPassword] = React.useState(false);
   
@@ -81,10 +83,10 @@ const LoginPage: React.FC = () => {
             <Science sx={{ fontSize: 36, color: colors.onPrimary }} />
           </Box>
           <Typography variant="h4" sx={{ fontWeight: 700, color: colors.onSurface, mb: 1 }}>
-            欢迎回来
+            {t('auth.loginTitle')}
           </Typography>
           <Typography variant="body2" sx={{ color: colors.onSurfaceVariant }}>
-            登录到 Chemezy 开始你的化学实验
+            {t('auth.loginSubtitle')}
           </Typography>
         </Box>
         
@@ -93,11 +95,11 @@ const LoginPage: React.FC = () => {
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
             <TextField
               fullWidth
-              label="用户名"
-              placeholder="输入你的用户名"
+              label={t('auth.username')}
+              placeholder={t('auth.enterUsername')}
               {...register('username')}
               error={!!errors.username}
-              helperText={errors.username?.message}
+              helperText={errors.username?.message as string}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -115,12 +117,12 @@ const LoginPage: React.FC = () => {
             
             <TextField
               fullWidth
-              label="密码"
+              label={t('auth.password')}
               type={showPassword ? 'text' : 'password'}
-              placeholder="输入你的密码"
+              placeholder={t('auth.enterPassword')}
               {...register('password')}
               error={!!errors.password}
-              helperText={errors.password?.message}
+              helperText={errors.password?.message as string}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -166,20 +168,20 @@ const LoginPage: React.FC = () => {
                 },
               }}
             >
-              {loginMutation.isPending ? '登录中...' : '登录'}
+              {loginMutation.isPending ? t('auth.loggingIn') : t('auth.login')}
             </Button>
           </Box>
         </form>
         
         <Divider sx={{ my: 3 }}>
           <Typography variant="caption" sx={{ color: colors.onSurfaceVariant, px: 2 }}>
-            或
+            {t('auth.or')}
           </Typography>
         </Divider>
         
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant="body2" sx={{ color: colors.onSurfaceVariant }}>
-            还没有账号？{' '}
+            {t('auth.noAccount')}{' '}
             <Link
               component="button"
               type="button"
@@ -191,7 +193,7 @@ const LoginPage: React.FC = () => {
                 '&:hover': { textDecoration: 'underline' },
               }}
             >
-              立即注册
+              {t('auth.signUpNow')}
             </Link>
           </Typography>
         </Box>

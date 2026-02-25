@@ -21,14 +21,16 @@ import {
   CheckCircle,
   Person,
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { PageLayout } from '@/components/layout';
 import { StatCard, LoadingSpinner, EmptyState } from '@/components/common';
 import { AwardCard } from '@/components/awards';
 import { useDashboardStats, useRecentAwards, useMyRank, useReactionStats } from '@/hooks';
 import { useAuth } from '@/hooks';
-import { colors, tierColors, tierLabels } from '@/theme';
+import { colors, tierColors } from '@/theme';
 
 const DashboardPage: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: recentAwards, isLoading: recentAwardsLoading } = useRecentAwards(7, 5);
@@ -39,8 +41,8 @@ const DashboardPage: React.FC = () => {
   
   if (isLoading) {
     return (
-      <PageLayout title="仪表板">
-        <LoadingSpinner message="加载统计数据..." />
+      <PageLayout title={t('dashboard.title')}>
+        <LoadingSpinner message={t('common.loading')} />
       </PageLayout>
     );
   }
@@ -49,44 +51,44 @@ const DashboardPage: React.FC = () => {
   
   return (
     <PageLayout
-      title="仪表板"
-      subtitle={`欢迎回来，${user?.username || '用户'}！`}
-      breadcrumbs={[{ label: '仪表板' }]}
+      title={t('dashboard.title')}
+      subtitle={t('dashboard.welcome', { username: user?.username || 'User' })}
+      breadcrumbs={[{ label: t('dashboard.title') }]}
     >
       {/* Stats cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
-            title="总反应次数"
+            title={t('dashboard.totalReactions')}
             value={reactionStats?.total_reactions || 0}
-            subtitle="累计实验次数"
+            subtitle={t('dashboard.reactionSubtitle')}
             icon={<Science sx={{ fontSize: 24 }} />}
             color={colors.primary}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
-            title="发现次数"
+            title={t('dashboard.discoveries')}
             value={reactionStats?.total_discoveries || 0}
-            subtitle="世界首次发现"
+            subtitle={t('dashboard.discoverySubtitle')}
             icon={<Whatshot sx={{ fontSize: 24 }} />}
             color={colors.tertiary}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
-            title="总奖励数"
+            title={t('dashboard.totalAwards')}
             value={dashboardStats.total_awards || myRank?.award_count || 0}
-            subtitle="已解锁奖励"
+            subtitle={t('dashboard.awardsSubtitle')}
             icon={<EmojiEvents sx={{ fontSize: 24 }} />}
             color={colors.gold}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard
-            title="总积分"
+            title={t('dashboard.totalPoints')}
             value={myRank?.total_points?.toLocaleString() || 0}
-            subtitle={`排名 #${myRank?.rank || '-'}`}
+            subtitle={t('dashboard.rank', { rank: myRank?.rank || '-' })}
             icon={<TrendingUp sx={{ fontSize: 24 }} />}
             color={colors.success}
           />
@@ -107,10 +109,10 @@ const DashboardPage: React.FC = () => {
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="h6" sx={{ fontWeight: 600, color: colors.onSurface }}>
-                  最近获得的奖励
+                  {t('dashboard.recentAwards')}
                 </Typography>
                 <Chip
-                  label="7天内"
+                  label={t('dashboard.last7Days')}
                   size="small"
                   sx={{
                     borderRadius: '9999px',
@@ -122,8 +124,8 @@ const DashboardPage: React.FC = () => {
               
               {!recentAwards?.recent_awards || recentAwards.recent_awards.length === 0 ? (
                 <EmptyState
-                  title="暂无新奖励"
-                  message="最近7天内没有获得新奖励"
+                  title={t('dashboard.noRecentAwards')}
+                  message={t('dashboard.noRecentAwardsMessage')}
                   icon={<EmojiEvents sx={{ fontSize: 48, color: colors.onSurfaceVariant }} />}
                   compact
                 />
@@ -149,7 +151,7 @@ const DashboardPage: React.FC = () => {
           >
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ fontWeight: 600, color: colors.onSurface, mb: 2 }}>
-                活动动态
+                {t('dashboard.activityFeed')}
               </Typography>
               
               <List sx={{ p: 0 }}>
@@ -161,8 +163,8 @@ const DashboardPage: React.FC = () => {
                     </Avatar>
                   </ListItemAvatar>
                   <ListItemText
-                    primary="欢迎加入 Chemezy"
-                    secondary="开始你的化学探索之旅"
+                    primary={t('dashboard.welcomeMessage')}
+                    secondary={t('dashboard.welcomeSubtitle')}
                     primaryTypographyProps={{ fontWeight: 600, color: colors.onSurface }}
                     secondaryTypographyProps={{ color: colors.onSurfaceVariant }}
                   />
@@ -179,8 +181,8 @@ const DashboardPage: React.FC = () => {
                         </Avatar>
                       </ListItemAvatar>
                       <ListItemText
-                        primary={`已完成 ${reactionStats.total_reactions} 次实验`}
-                        secondary={`发现 ${reactionStats.total_discoveries} 个新反应`}
+                        primary={t('dashboard.experimentsCompleted', { count: reactionStats.total_reactions })}
+                        secondary={t('dashboard.discoveriesMade', { count: reactionStats.total_discoveries })}
                         primaryTypographyProps={{ fontWeight: 600, color: colors.onSurface }}
                         secondaryTypographyProps={{ color: colors.onSurfaceVariant }}
                       />
@@ -199,8 +201,8 @@ const DashboardPage: React.FC = () => {
                         </Avatar>
                       </ListItemAvatar>
                       <ListItemText
-                        primary={`当前排名 #${myRank.rank}`}
-                        secondary={`拥有 ${myRank.award_count} 个奖励 · ${myRank.total_points.toLocaleString()} 积分`}
+                        primary={t('dashboard.currentRank', { rank: myRank.rank })}
+                        secondary={t('dashboard.pointsAndAwards', { awards: myRank.award_count, points: myRank.total_points.toLocaleString() })}
                         primaryTypographyProps={{ fontWeight: 600, color: colors.onSurface }}
                         secondaryTypographyProps={{ color: colors.onSurfaceVariant }}
                       />
@@ -223,7 +225,7 @@ const DashboardPage: React.FC = () => {
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText
-                      primary={`获得 ${tierLabels[recentAwards.recent_awards[0].tier]} 奖励`}
+                      primary={t('dashboard.earnedAward', { tier: t(`awards.${recentAwards.recent_awards[0].tier}`) })}
                       secondary={recentAwards.recent_awards[0].template.name}
                       primaryTypographyProps={{ fontWeight: 600, color: colors.onSurface }}
                       secondaryTypographyProps={{ color: colors.onSurfaceVariant }}
@@ -246,7 +248,7 @@ const DashboardPage: React.FC = () => {
       >
         <CardContent sx={{ p: 3 }}>
           <Typography variant="h6" sx={{ fontWeight: 600, color: colors.onSurface, mb: 2 }}>
-            快速操作
+            {t('dashboard.quickActions')}
           </Typography>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -268,7 +270,7 @@ const DashboardPage: React.FC = () => {
                 <CardContent sx={{ p: 2, textAlign: 'center' }}>
                   <Science sx={{ fontSize: 32, color: colors.primary, mb: 1 }} />
                   <Typography variant="body1" sx={{ fontWeight: 600, color: colors.onPrimaryContainer }}>
-                    开始实验
+                    {t('dashboard.startExperiment')}
                   </Typography>
                 </CardContent>
               </Card>
@@ -292,7 +294,7 @@ const DashboardPage: React.FC = () => {
                 <CardContent sx={{ p: 2, textAlign: 'center' }}>
                   <Science sx={{ fontSize: 32, color: colors.secondary, mb: 1 }} />
                   <Typography variant="body1" sx={{ fontWeight: 600, color: colors.onSecondaryContainer }}>
-                    浏览化学品
+                    {t('dashboard.browseChemicals')}
                   </Typography>
                 </CardContent>
               </Card>
@@ -316,7 +318,7 @@ const DashboardPage: React.FC = () => {
                 <CardContent sx={{ p: 2, textAlign: 'center' }}>
                   <EmojiEvents sx={{ fontSize: 32, color: colors.tertiary, mb: 1 }} />
                   <Typography variant="body1" sx={{ fontWeight: 600, color: colors.onTertiaryContainer }}>
-                    查看奖励
+                    {t('dashboard.viewAwards')}
                   </Typography>
                 </CardContent>
               </Card>
@@ -340,7 +342,7 @@ const DashboardPage: React.FC = () => {
                 <CardContent sx={{ p: 2, textAlign: 'center' }}>
                   <TrendingUp sx={{ fontSize: 32, color: colors.success, mb: 1 }} />
                   <Typography variant="body1" sx={{ fontWeight: 600, color: colors.onSuccessContainer }}>
-                    查看排行
+                    {t('dashboard.viewLeaderboard')}
                   </Typography>
                 </CardContent>
               </Card>

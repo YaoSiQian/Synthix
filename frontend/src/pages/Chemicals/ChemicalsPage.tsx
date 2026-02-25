@@ -11,6 +11,7 @@ import {
   Chip,
 } from '@mui/material';
 import { Search, Science } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { PageLayout } from '@/components/layout';
 import { ChemicalCard } from '@/components/lab';
 import { LoadingSpinner, EmptyState } from '@/components/common';
@@ -18,14 +19,15 @@ import { useChemicals, useChemicalSearch } from '@/hooks';
 import { colors } from '@/theme';
 
 const stateFilters = [
-  { value: 'all', label: '全部', icon: '⚗️' },
-  { value: 'solid', label: '固体', icon: '⬛' },
-  { value: 'liquid', label: '液体', icon: '💧' },
-  { value: 'gas', label: '气体', icon: '💨' },
-  { value: 'plasma', label: '等离子体', icon: '⚡' },
+  { value: 'all', labelKey: 'common.all', icon: '⚗️' },
+  { value: 'solid', labelKey: 'chemicals.solid', icon: '⬛' },
+  { value: 'liquid', labelKey: 'chemicals.liquid', icon: '💧' },
+  { value: 'gas', labelKey: 'chemicals.gas', icon: '💨' },
+  { value: 'plasma', labelKey: 'chemicals.plasma', icon: '⚡' },
 ];
 
 const ChemicalsPage: React.FC = () => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = React.useState('');
   const [stateFilter, setStateFilter] = React.useState('all');
   const [page, setPage] = React.useState(1);
@@ -66,9 +68,9 @@ const ChemicalsPage: React.FC = () => {
   
   return (
     <PageLayout
-      title="化学品库"
-      subtitle="浏览和管理你的化学品收藏"
-      breadcrumbs={[{ label: '化学品库' }]}
+      title={t('chemicals.title')}
+      subtitle={t('chemicals.search')}
+      breadcrumbs={[{ label: t('chemicals.title') }]}
     >
       {/* Search and filters */}
       <Box sx={{ mb: 3 }}>
@@ -76,7 +78,7 @@ const ChemicalsPage: React.FC = () => {
           <Grid size={{ xs: 12, md: 6 }}>
             <TextField
               fullWidth
-              placeholder="搜索化学品 (分子式或名称)..."
+              placeholder={t('chemicals.search')}
               value={searchQuery}
               onChange={handleSearchChange}
               InputProps={{
@@ -116,7 +118,7 @@ const ChemicalsPage: React.FC = () => {
                   label={
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <span>{filter.icon}</span>
-                      <span>{filter.label}</span>
+                      <span>{t(filter.labelKey)}</span>
                     </Box>
                   }
                   sx={{
@@ -140,11 +142,11 @@ const ChemicalsPage: React.FC = () => {
       {/* Results count */}
       <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
         <Typography variant="body2" sx={{ color: colors.onSurfaceVariant }}>
-          共 {filteredChemicals.length} 种化学品
+          {t('common.showing')} {filteredChemicals.length} {t('chemicals.title')}
         </Typography>
         {searchQuery && (
           <Chip
-            label={`搜索: "${searchQuery}"`}
+            label={`${t('common.search')}: "${searchQuery}"`}
             size="small"
             onDelete={() => setSearchQuery('')}
             sx={{
@@ -156,7 +158,7 @@ const ChemicalsPage: React.FC = () => {
         )}
         {stateFilter !== 'all' && (
           <Chip
-            label={`状态: ${stateFilters.find((f) => f.value === stateFilter)?.label}`}
+            label={`${t('common.filter')}: ${t(stateFilters.find((f) => f.value === stateFilter)?.labelKey || '')}`}
             size="small"
             onDelete={() => setStateFilter('all')}
             sx={{
@@ -170,13 +172,13 @@ const ChemicalsPage: React.FC = () => {
       
       {/* Chemicals grid */}
       {isLoading || searchLoading ? (
-        <LoadingSpinner message="加载化学品..." />
+        <LoadingSpinner message={t('common.loading')} />
       ) : paginatedChemicals.length === 0 ? (
         <EmptyState
-          title="未找到化学品"
-          message={searchQuery ? '尝试使用其他关键词搜索' : '化学品库为空，请添加一些化学品'}
+          title={t('chemicals.noResults')}
+          message={searchQuery ? t('chemicals.noResults') : t('chemicals.noResults')}
           icon={<Science sx={{ fontSize: 64, color: colors.onSurfaceVariant }} />}
-          actionLabel="去实验室添加"
+          actionLabel={t('nav.lab')}
           onAction={() => window.location.href = '/lab'}
         />
       ) : (

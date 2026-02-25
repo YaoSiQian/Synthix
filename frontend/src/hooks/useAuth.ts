@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { authApi } from '@/api';
 import { useAuthStore } from '@/store';
 import { useUIStore } from '@/store';
@@ -21,6 +22,7 @@ export const useAuth = () => {
 
 export const useLogin = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { setAuth, addNotification } = useAuth();
   const queryClient = useQueryClient();
   
@@ -33,24 +35,24 @@ export const useLogin = () => {
         setAuth(token.access_token, user);
         addNotification({
           type: 'success',
-          title: '登录成功',
-          message: `欢迎回来，${user.username}！`,
+          title: t('auth.loginSuccess'),
+          message: t('auth.welcomeBack', { username: user.username }),
         });
         queryClient.invalidateQueries({ queryKey: ['user'] });
         navigate('/lab');
       } catch (error) {
         addNotification({
           type: 'error',
-          title: '登录失败',
-          message: '获取用户信息失败',
+          title: t('auth.loginFailed'),
+          message: t('auth.getUserFailed'),
         });
       }
     },
     onError: (error: { message?: string }) => {
       addNotification({
         type: 'error',
-        title: '登录失败',
-        message: error.message || '用户名或密码错误',
+        title: t('auth.loginFailed'),
+        message: error.message || t('auth.invalidCredentials'),
       });
     },
   });
@@ -58,6 +60,7 @@ export const useLogin = () => {
 
 export const useRegister = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { addNotification } = useAuth();
   
   return useMutation({
@@ -65,16 +68,16 @@ export const useRegister = () => {
     onSuccess: () => {
       addNotification({
         type: 'success',
-        title: '注册成功',
-        message: '请使用新账号登录',
+        title: t('auth.registerSuccess'),
+        message: t('auth.registerSuccessMessage'),
       });
       navigate('/login');
     },
     onError: (error: { message?: string }) => {
       addNotification({
         type: 'error',
-        title: '注册失败',
-        message: error.message || '注册过程中出现错误',
+        title: t('auth.registerFailed'),
+        message: error.message || t('auth.registerError'),
       });
     },
   });

@@ -19,19 +19,21 @@ import {
 } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useUIStore } from '@/store';
 import { colors } from '@/theme';
 
 const sidebarItems = [
-  { path: '/lab', label: '实验室', icon: <Science /> },
-  { path: '/chemicals', label: '化学品库', icon: <Science /> },
-  { path: '/awards', label: '我的奖励', icon: <EmojiEvents /> },
-  { path: '/leaderboard', label: '排行榜', icon: <EmojiEvents /> },
-  { path: '/dashboard', label: '仪表板', icon: <Dashboard /> },
-  { path: '/profile', label: '个人资料', icon: <Settings /> },
+  { path: '/lab', labelKey: 'nav.lab', icon: <Science /> },
+  { path: '/chemicals', labelKey: 'nav.chemicals', icon: <Science /> },
+  { path: '/awards', labelKey: 'nav.awards', icon: <EmojiEvents /> },
+  { path: '/leaderboard', labelKey: 'nav.leaderboard', icon: <EmojiEvents /> },
+  { path: '/dashboard', labelKey: 'nav.dashboard', icon: <Dashboard /> },
+  { path: '/profile', labelKey: 'nav.profile', icon: <Settings /> },
 ];
 
 export const Sidebar: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const sidebarOpen = useUIStore((s) => s.sidebarOpen);
@@ -93,7 +95,7 @@ export const Sidebar: React.FC = () => {
                 {item.icon}
               </ListItemIcon>
               <ListItemText
-                primary={item.label}
+                primary={t(item.labelKey)}
                 primaryTypographyProps={{
                   fontWeight: isActive(item.path) ? 600 : 500,
                   fontSize: '0.9375rem',

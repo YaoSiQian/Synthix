@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Typography, Card, CardContent } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { colors } from '@/theme';
 import { environments, type Environment } from '@/types';
 
@@ -14,6 +15,8 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
   onChange,
   disabled = false,
 }) => {
+  const { t } = useTranslation();
+  
   return (
     <Box>
       <Typography
@@ -24,7 +27,7 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
           mb: 2,
         }}
       >
-        选择实验环境
+        {t('lab.environment')}
       </Typography>
       <Box
         sx={{
@@ -80,7 +83,7 @@ export const EnvironmentSelector: React.FC<EnvironmentSelectorProps> = ({
                     display: 'block',
                   }}
                 >
-                  {env.description}
+                  {t(`environments.${env.name}`)}
                 </Typography>
               </CardContent>
             </Card>

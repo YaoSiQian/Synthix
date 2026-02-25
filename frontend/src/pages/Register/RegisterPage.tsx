@@ -24,16 +24,17 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useRegister } from '@/hooks';
 import { colors } from '@/theme';
 
 const registerSchema = z.object({
-  username: z.string().min(3, '用户名至少3个字符').max(20, '用户名最多20个字符'),
-  email: z.string().email('请输入有效的邮箱地址'),
-  password: z.string().min(6, '密码至少6个字符'),
+  username: z.string().min(3, 'validation.usernameMinLength').max(20, 'validation.usernameMaxLength'),
+  email: z.string().email('validation.emailInvalid'),
+  password: z.string().min(6, 'validation.passwordMinLength'),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: '两次输入的密码不一致',
+  message: 'validation.passwordMismatch',
   path: ['confirmPassword'],
 });
 
@@ -41,6 +42,7 @@ type RegisterForm = z.infer<typeof registerSchema>;
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const registerMutation = useRegister();
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
@@ -90,10 +92,10 @@ const RegisterPage: React.FC = () => {
             <Science sx={{ fontSize: 36, color: colors.onPrimary }} />
           </Box>
           <Typography variant="h4" sx={{ fontWeight: 700, color: colors.onSurface, mb: 1 }}>
-            创建账号
+            {t('auth.registerTitle')}
           </Typography>
           <Typography variant="body2" sx={{ color: colors.onSurfaceVariant }}>
-            加入 Chemezy 开始你的化学探索之旅
+            {t('auth.registerSubtitle')}
           </Typography>
         </Box>
         
@@ -102,11 +104,11 @@ const RegisterPage: React.FC = () => {
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
             <TextField
               fullWidth
-              label="用户名"
-              placeholder="选择一个用户名"
+              label={t('auth.username')}
+              placeholder={t('auth.chooseUsername')}
               {...register('username')}
               error={!!errors.username}
-              helperText={errors.username?.message}
+              helperText={errors.username?.message as string}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -124,12 +126,12 @@ const RegisterPage: React.FC = () => {
             
             <TextField
               fullWidth
-              label="邮箱"
+              label={t('auth.email')}
               type="email"
-              placeholder="输入你的邮箱"
+              placeholder={t('auth.enterEmail')}
               {...register('email')}
               error={!!errors.email}
-              helperText={errors.email?.message}
+              helperText={errors.email?.message as string}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -147,12 +149,12 @@ const RegisterPage: React.FC = () => {
             
             <TextField
               fullWidth
-              label="密码"
+              label={t('auth.password')}
               type={showPassword ? 'text' : 'password'}
-              placeholder="设置密码"
+              placeholder={t('auth.setPassword')}
               {...register('password')}
               error={!!errors.password}
-              helperText={errors.password?.message}
+              helperText={errors.password?.message as string}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -180,12 +182,12 @@ const RegisterPage: React.FC = () => {
             
             <TextField
               fullWidth
-              label="确认密码"
+              label={t('auth.confirmPassword')}
               type={showConfirmPassword ? 'text' : 'password'}
-              placeholder="再次输入密码"
+              placeholder={t('auth.enterPasswordAgain')}
               {...register('confirmPassword')}
               error={!!errors.confirmPassword}
-              helperText={errors.confirmPassword?.message}
+              helperText={errors.confirmPassword?.message as string}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -231,20 +233,20 @@ const RegisterPage: React.FC = () => {
                 },
               }}
             >
-              {registerMutation.isPending ? '注册中...' : '创建账号'}
+              {registerMutation.isPending ? t('auth.registering') : t('auth.registerTitle')}
             </Button>
           </Box>
         </form>
         
         <Divider sx={{ my: 3 }}>
           <Typography variant="caption" sx={{ color: colors.onSurfaceVariant, px: 2 }}>
-            或
+            {t('auth.or')}
           </Typography>
         </Divider>
         
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant="body2" sx={{ color: colors.onSurfaceVariant }}>
-            已有账号？{' '}
+            {t('auth.hasAccount')}{' '}
             <Link
               component="button"
               type="button"
@@ -256,7 +258,7 @@ const RegisterPage: React.FC = () => {
                 '&:hover': { textDecoration: 'underline' },
               }}
             >
-              立即登录
+              {t('auth.loginNow')}
             </Link>
           </Typography>
         </Box>

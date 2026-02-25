@@ -18,29 +18,33 @@ import {
   EmojiEvents,
   Dashboard,
   Settings,
+  Language,
 } from '@mui/icons-material';
 
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useLogout } from '@/hooks';
 import { useUIStore } from '@/store';
 import { colors } from '@/theme';
 
 const navItems = [
-  { path: '/lab', label: '实验室', icon: <Science /> },
-  { path: '/chemicals', label: '化学品库', icon: <Science /> },
-  { path: '/awards', label: '奖励', icon: <EmojiEvents /> },
-  { path: '/leaderboard', label: '排行榜', icon: <EmojiEvents /> },
-  { path: '/dashboard', label: '仪表板', icon: <Dashboard /> },
+  { path: '/lab', labelKey: 'nav.lab', icon: <Science /> },
+  { path: '/chemicals', labelKey: 'nav.chemicals', icon: <Science /> },
+  { path: '/awards', labelKey: 'nav.awards', icon: <EmojiEvents /> },
+  { path: '/leaderboard', labelKey: 'nav.leaderboard', icon: <EmojiEvents /> },
+  { path: '/dashboard', labelKey: 'nav.dashboard', icon: <Dashboard /> },
 ];
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t, i18n } = useTranslation();
   const { user, isAuthenticated } = useAuth();
   const { handleLogout } = useLogout();
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
   
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [langAnchorEl, setLangAnchorEl] = React.useState<null | HTMLElement>(null);
   
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -143,7 +147,7 @@ export const Header: React.FC = () => {
                 {item.icon}
               </Box>
               <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                {item.label}
+                {t(item.labelKey)}
               </Typography>
             </Box>
           ))}
@@ -152,7 +156,38 @@ export const Header: React.FC = () => {
         {/* User menu */}
         {isAuthenticated ? (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Tooltip title="账户设置">
+            <Tooltip title={t('profile.language')}>
+              <IconButton onClick={(e) => setLangAnchorEl(e.currentTarget)}>
+                <Language sx={{ color: colors.onSurfaceVariant }} />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              anchorEl={langAnchorEl}
+              open={Boolean(langAnchorEl)}
+              onClose={() => setLangAnchorEl(null)}
+              PaperProps={{
+                sx: {
+                  mt: 1,
+                  borderRadius: '12px',
+                  minWidth: 120,
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                },
+              }}
+            >
+              <MenuItem 
+                onClick={() => { i18n.changeLanguage('zh'); setLangAnchorEl(null); }}
+                selected={i18n.language === 'zh'}
+              >
+                中文
+              </MenuItem>
+              <MenuItem 
+                onClick={() => { i18n.changeLanguage('en'); setLangAnchorEl(null); }}
+                selected={i18n.language === 'en'}
+              >
+                English
+              </MenuItem>
+            </Menu>
+            <Tooltip title={t('profile.settings')}>
               <IconButton onClick={handleMenuOpen}>
                 <Avatar
                   sx={{
@@ -188,16 +223,47 @@ export const Header: React.FC = () => {
               </MenuItem>
               <MenuItem onClick={() => handleNavigate('/profile')}>
                 <Settings sx={{ mr: 1.5, fontSize: 20 }} />
-                个人资料
+                {t('nav.profile')}
               </MenuItem>
               <MenuItem onClick={handleLogout}>
                 <Logout sx={{ mr: 1.5, fontSize: 20 }} />
-                退出登录
+                {t('auth.logout')}
               </MenuItem>
             </Menu>
           </Box>
         ) : (
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Tooltip title={t('profile.language')}>
+              <IconButton onClick={(e) => setLangAnchorEl(e.currentTarget)}>
+                <Language sx={{ color: colors.onSurfaceVariant }} />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              anchorEl={langAnchorEl}
+              open={Boolean(langAnchorEl)}
+              onClose={() => setLangAnchorEl(null)}
+              PaperProps={{
+                sx: {
+                  mt: 1,
+                  borderRadius: '12px',
+                  minWidth: 120,
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                },
+              }}
+            >
+              <MenuItem 
+                onClick={() => { i18n.changeLanguage('zh'); setLangAnchorEl(null); }}
+                selected={i18n.language === 'zh'}
+              >
+                中文
+              </MenuItem>
+              <MenuItem 
+                onClick={() => { i18n.changeLanguage('en'); setLangAnchorEl(null); }}
+                selected={i18n.language === 'en'}
+              >
+                English
+              </MenuItem>
+            </Menu>
             <Box
               onClick={() => navigate('/login')}
               sx={{
@@ -213,7 +279,7 @@ export const Header: React.FC = () => {
               }}
             >
               <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                登录
+                {t('auth.login')}
               </Typography>
             </Box>
             <Box
@@ -233,7 +299,7 @@ export const Header: React.FC = () => {
               }}
             >
               <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                注册
+                {t('auth.register')}
               </Typography>
             </Box>
           </Box>

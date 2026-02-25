@@ -19,6 +19,7 @@ import {
   Science,
   Refresh,
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { PageLayout } from '@/components/layout';
 import { ChemicalCard, EnvironmentSelector, Beaker, ReactionResult } from '@/components/lab';
 import { LoadingSpinner, EmptyState } from '@/components/common';
@@ -28,6 +29,7 @@ import { colors } from '@/theme';
 import type { ChemicalRead, Environment } from '@/types';
 
 const LabPage: React.FC = () => {
+  const { t } = useTranslation();
   const {
     reactants,
     addReactant,
@@ -56,8 +58,8 @@ const LabPage: React.FC = () => {
     if (!newFormula.trim()) {
       addNotification({
         type: 'error',
-        title: '输入错误',
-        message: '请输入分子式',
+        title: t('notifications.inputError'),
+        message: t('notifications.enterFormula'),
       });
       return;
     }
@@ -82,8 +84,8 @@ const LabPage: React.FC = () => {
         addReactant(chemical);
         addNotification({
           type: 'success',
-          title: '添加成功',
-          message: `${chemical.molecular_formula} 已添加到反应物`,
+          title: t('notifications.addSuccess'),
+          message: t('notifications.chemicalAdded', { formula: chemical.molecular_formula }),
         });
       } catch (err) {
         console.error('Failed to parse chemical data:', err);
@@ -95,8 +97,8 @@ const LabPage: React.FC = () => {
     if (reactants.length === 0) {
       addNotification({
         type: 'error',
-        title: '无法开始反应',
-        message: '请先添加反应物',
+        title: t('notifications.cannotStart'),
+        message: t('notifications.addReactantsFirst'),
       });
       return;
     }
@@ -116,14 +118,14 @@ const LabPage: React.FC = () => {
     } else {
       addNotification({
         type: 'info',
-        title: '添加产物',
-        message: `${product.molecular_formula} 已添加到反应物`,
+        title: t('notifications.addSuccess'),
+        message: t('notifications.chemicalAdded', { formula: product.molecular_formula }),
       });
     }
   };
   
   return (
-    <PageLayout title="虚拟实验室" subtitle="探索化学反应的无限可能">
+    <PageLayout title={t('lab.title')} subtitle={t('lab.selectChemical')}>
       <Grid container spacing={3}>
         {/* Left side - Lab operations */}
         <Grid size={{ xs: 12, lg: 8 }}>
@@ -137,12 +139,12 @@ const LabPage: React.FC = () => {
           >
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ fontWeight: 600, color: colors.onSurface, mb: 2 }}>
-                快速添加化学品
+                {t('lab.addReactant')}
               </Typography>
               <Box sx={{ display: 'flex', gap: 2, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
                 <TextField
-                  label="分子式"
-                  placeholder="例如: H2O, NaCl, C6H12O6"
+                  label={t('lab.molecularFormula')}
+                  placeholder="H2O, NaCl, C6H12O6"
                   value={newFormula}
                   onChange={(e) => setNewFormula(e.target.value)}
                   sx={{
@@ -154,8 +156,8 @@ const LabPage: React.FC = () => {
                   }}
                 />
                 <TextField
-                  label="上下文 (可选)"
-                  placeholder="例如: 食盐, 维生素C"
+                  label={t('lab.context')}
+                  placeholder="NaCl, Vitamin C"
                   value={newContext}
                   onChange={(e) => setNewContext(e.target.value)}
                   sx={{
@@ -177,7 +179,7 @@ const LabPage: React.FC = () => {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  添加
+                  {t('lab.add')}
                 </Button>
               </Box>
             </CardContent>
@@ -211,7 +213,7 @@ const LabPage: React.FC = () => {
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                 <Typography variant="h6" sx={{ fontWeight: 600, color: colors.onSurface }}>
-                  反应区域
+                  {t('lab.reactants')}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1 }}>
                   <Button
@@ -222,7 +224,7 @@ const LabPage: React.FC = () => {
                     disabled={reactants.length === 0 || isReacting}
                     sx={{ borderRadius: '9999px', textTransform: 'none' }}
                   >
-                    清空
+                    {t('lab.clear')}
                   </Button>
                 </Box>
               </Box>
@@ -242,7 +244,7 @@ const LabPage: React.FC = () => {
               {reactants.length > 0 && (
                 <Box sx={{ mb: 3 }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: 600, color: colors.onSurface, mb: 1.5 }}>
-                    当前反应物
+                    {t('lab.reactants')}
                   </Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                     {reactants.map((reactant) => (
@@ -268,7 +270,7 @@ const LabPage: React.FC = () => {
               {/* Catalyst selector */}
               <Box sx={{ mb: 3 }}>
                 <FormControl fullWidth>
-                  <InputLabel>催化剂 (可选)</InputLabel>
+                  <InputLabel>{t('lab.catalyst')}</InputLabel>
                   <Select
                     value={selectedCatalyst || ''}
                     onChange={(e) => setCatalyst(e.target.value ? Number(e.target.value) : null)}
@@ -278,7 +280,7 @@ const LabPage: React.FC = () => {
                       backgroundColor: colors.surfaceContainerLow,
                     }}
                   >
-                    <MenuItem value="">无催化剂</MenuItem>
+                    <MenuItem value="">{t('lab.none')}</MenuItem>
                     {chemicals.map((c) => (
                       <MenuItem key={c.id} value={c.id}>
                         {c.molecular_formula} ({c.common_name})
@@ -309,7 +311,7 @@ const LabPage: React.FC = () => {
                   },
                 }}
               >
-                {isReacting ? '反应进行中...' : '开始反应'}
+                {isReacting ? t('lab.running') : t('lab.runReaction')}
               </Button>
             </CardContent>
           </Card>
@@ -330,15 +332,15 @@ const LabPage: React.FC = () => {
           >
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ fontWeight: 600, color: colors.onSurface, mb: 2 }}>
-                化学品库存
+                {t('chemicals.title')}
               </Typography>
               
               {chemicalsLoading ? (
-                <LoadingSpinner size={32} message="加载中..." />
+                <LoadingSpinner size={32} message={t('common.loading')} />
               ) : chemicals.length === 0 ? (
                 <EmptyState
-                  title="暂无化学品"
-                  message="使用上方表单添加化学品"
+                  title={t('chemicals.noResults')}
+                  message={t('lab.addReactant')}
                   icon={<Science sx={{ fontSize: 48, color: colors.onSurfaceVariant }} />}
                 />
               ) : (
@@ -368,7 +370,7 @@ const LabPage: React.FC = () => {
             >
               <CardContent sx={{ p: 3 }}>
                 <Typography variant="h6" sx={{ fontWeight: 600, color: colors.onSurface, mb: 2 }}>
-                  实验台产物
+                  {t('lab.products')}
                 </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                   {benchProducts.map((product, index) => (
@@ -398,7 +400,7 @@ const LabPage: React.FC = () => {
                             onClick={() => handleAddFromBench(product)}
                             sx={{ borderRadius: '9999px', textTransform: 'none' }}
                           >
-                            添加
+                            {t('lab.add')}
                           </Button>
                         </Box>
                       </CardContent>
