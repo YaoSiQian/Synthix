@@ -35,6 +35,7 @@ const LeaderboardPage: React.FC = () => {
   const { user } = useAuth();
   
   const { data: leaderboard, isLoading: leaderboardLoading } = useLeaderboard(activeCategory);
+  const entries = leaderboard?.items || [];
   const { data: myRank } = useMyRank(
     activeCategory === 'overall' ? undefined : activeCategory
   );
@@ -125,7 +126,7 @@ const LeaderboardPage: React.FC = () => {
                 </Typography>
               </Box>
               <Chip
-                label={`Top ${((myRank.rank / (leaderboard?.length || 1)) * 100).toFixed(1)}%`}
+                label={`Top ${((myRank.rank / (entries.length || 1)) * 100).toFixed(1)}%`}
                 sx={{
                   borderRadius: '9999px',
                   backgroundColor: colors.primary,
@@ -139,7 +140,7 @@ const LeaderboardPage: React.FC = () => {
       )}
       
       {/* Top 3 podium */}
-      {leaderboard && leaderboard.length >= 3 && (
+      {entries && entries.length >= 3 && (
         <Box sx={{ mb: 4 }}>
           <Grid container spacing={2} alignItems="flex-end">
             {/* 2nd place */}
@@ -165,13 +166,13 @@ const LeaderboardPage: React.FC = () => {
                       fontWeight: 600,
                     }}
                   >
-                    {leaderboard[1].username.charAt(0).toUpperCase()}
+                    {entries[1].username.charAt(0).toUpperCase()}
                   </Avatar>
                   <Typography variant="body1" sx={{ fontWeight: 600, color: colors.onSurface }}>
-                    {leaderboard[1].username}
+                    {entries[1].username}
                   </Typography>
                   <Typography variant="h6" sx={{ fontWeight: 700, color: tierColors[2] }}>
-                    {leaderboard[1].total_points.toLocaleString()}
+                    {entries[1].total_points.toLocaleString()}
                   </Typography>
                 </CardContent>
               </Card>
@@ -202,13 +203,13 @@ const LeaderboardPage: React.FC = () => {
                       fontSize: '1.5rem',
                     }}
                   >
-                    {leaderboard[0].username.charAt(0).toUpperCase()}
+                    {entries[0].username.charAt(0).toUpperCase()}
                   </Avatar>
                   <Typography variant="h6" sx={{ fontWeight: 700, color: colors.onSurface }}>
-                    {leaderboard[0].username}
+                    {entries[0].username}
                   </Typography>
                   <Typography variant="h5" sx={{ fontWeight: 700, color: tierColors[3] }}>
-                    {leaderboard[0].total_points.toLocaleString()}
+                    {entries[0].total_points.toLocaleString()}
                   </Typography>
                 </CardContent>
               </Card>
@@ -237,13 +238,13 @@ const LeaderboardPage: React.FC = () => {
                       fontWeight: 600,
                     }}
                   >
-                    {leaderboard[2].username.charAt(0).toUpperCase()}
+                    {entries[2].username.charAt(0).toUpperCase()}
                   </Avatar>
                   <Typography variant="body1" sx={{ fontWeight: 600, color: colors.onSurface }}>
-                    {leaderboard[2].username}
+                    {entries[2].username}
                   </Typography>
                   <Typography variant="h6" sx={{ fontWeight: 700, color: tierColors[1] }}>
-                    {leaderboard[2].total_points.toLocaleString()}
+                    {entries[2].total_points.toLocaleString()}
                   </Typography>
                 </CardContent>
               </Card>
@@ -255,7 +256,7 @@ const LeaderboardPage: React.FC = () => {
       {/* Full leaderboard table */}
       {leaderboardLoading ? (
         <LoadingSpinner message="加载排行榜..." />
-      ) : !leaderboard || leaderboard.length === 0 ? (
+      ) : !entries || entries.length === 0 ? (
         <EmptyState
           title="暂无数据"
           message="排行榜数据为空"
@@ -263,7 +264,7 @@ const LeaderboardPage: React.FC = () => {
         />
       ) : (
         <LeaderboardTable
-          entries={leaderboard}
+          entries={entries}
           highlightUserId={user?.id}
         />
       )}

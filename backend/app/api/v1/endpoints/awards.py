@@ -151,6 +151,88 @@ async def get_available_awards(
         )
 
 
+@router.get("/leaderboard/overall")
+async def get_overall_leaderboard(
+    page: int = Query(1, ge=1, description="Page number (1-based)"),
+    page_size: int = Query(20, ge=1, le=100, description="Number of items per page"),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_session)
+):
+    """
+    Get overall leaderboard rankings across all award categories with pagination.
+    
+    Returns users ranked by total points earned across all categories.
+    Supports MUI-style pagination with page and page_size parameters.
+    
+    - **page**: Page number (1-based)
+    - **page_size**: Number of items per page (1-100)
+    """
+    try:
+        leaderboard_service = LeaderboardService(db)
+        result = await leaderboard_service.get_overall_leaderboard_paginated(
+            page=page,
+            page_size=page_size
+        )
+        
+        return result
+        
+    except LeaderboardServiceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve overall leaderboard: {str(e)}"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while retrieving overall leaderboard"
+        )
+
+
+@router.get("/leaderboard/my-rank", response_model=UserRankSchema)
+async def get_my_rank(
+    category: Optional[AwardCategory] = Query(None, description="Category to check rank in (None for overall)"),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_session)
+):
+    """
+    Get current user's rank in the leaderboard.
+    
+    Returns the user's position and statistics in the specified category
+    or overall leaderboard if no category is specified.
+    
+    - **category**: Optional category to check rank in (None for overall)
+    """
+    try:
+        leaderboard_service = LeaderboardService(db)
+        rank_data = await leaderboard_service.get_user_rank(
+            user_id=current_user.id,
+            category=category
+        )
+        
+        if not rank_data:
+            return UserRankSchema(
+                rank=None,
+                user_id=current_user.id,
+                username=current_user.username,
+                award_count=0,
+                total_points=0,
+                category=category.value if category else "overall"
+            )
+        
+        return UserRankSchema(**rank_data)
+        
+    except LeaderboardServiceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve user rank: {str(e)}"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while retrieving user rank"
+        )
+
+
 @router.get("/leaderboard/{category}")
 async def get_leaderboard(
     category: AwardCategory,
@@ -273,88 +355,6 @@ async def get_user_awards(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while retrieving user awards"
-        )
-
-
-@router.get("/leaderboard/overall")
-async def get_overall_leaderboard(
-    page: int = Query(1, ge=1, description="Page number (1-based)"),
-    page_size: int = Query(20, ge=1, le=100, description="Number of items per page"),
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_session)
-):
-    """
-    Get overall leaderboard rankings across all award categories with pagination.
-    
-    Returns users ranked by total points earned across all categories.
-    Supports MUI-style pagination with page and page_size parameters.
-    
-    - **page**: Page number (1-based)
-    - **page_size**: Number of items per page (1-100)
-    """
-    try:
-        leaderboard_service = LeaderboardService(db)
-        result = await leaderboard_service.get_overall_leaderboard_paginated(
-            page=page,
-            page_size=page_size
-        )
-        
-        return result
-        
-    except LeaderboardServiceError as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to retrieve overall leaderboard: {str(e)}"
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred while retrieving overall leaderboard"
-        )
-
-
-@router.get("/leaderboard/my-rank", response_model=UserRankSchema)
-async def get_my_rank(
-    category: Optional[AwardCategory] = Query(None, description="Category to check rank in (None for overall)"),
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_session)
-):
-    """
-    Get current user's rank in the leaderboard.
-    
-    Returns the user's position and statistics in the specified category
-    or overall leaderboard if no category is specified.
-    
-    - **category**: Optional category to check rank in (None for overall)
-    """
-    try:
-        leaderboard_service = LeaderboardService(db)
-        rank_data = await leaderboard_service.get_user_rank(
-            user_id=current_user.id,
-            category=category
-        )
-        
-        if not rank_data:
-            return UserRankSchema(
-                rank=None,
-                user_id=current_user.id,
-                username=current_user.username,
-                award_count=0,
-                total_points=0,
-                category=category.value if category else "overall"
-            )
-        
-        return UserRankSchema(**rank_data)
-        
-    except LeaderboardServiceError as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to retrieve user rank: {str(e)}"
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred while retrieving user rank"
         )
 
 
