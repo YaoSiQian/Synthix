@@ -107,7 +107,7 @@ const LoginPage: React.FC = () => {
               placeholder={t('auth.enterUsername')}
               {...register('username')}
               error={!!errors.username}
-              helperText={errors.username?.message as string}
+              helperText={errors.username ? t(errors.username.message as string) : undefined}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -130,7 +130,7 @@ const LoginPage: React.FC = () => {
               placeholder={t('auth.enterPassword')}
               {...register('password')}
               error={!!errors.password}
-              helperText={errors.password?.message as string}
+              helperText={errors.password ? t(errors.password.message as string) : undefined}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">

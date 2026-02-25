@@ -4,6 +4,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import CssBaseline from '@mui/material/CssBaseline';
+import { useTranslation } from 'react-i18next';
 import { theme } from '@/theme';
 import { ProtectedRoute } from '@/components/common';
 import { LoadingSpinner } from '@/components/common';
@@ -31,12 +32,14 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  const { t } = useTranslation();
+  
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <BrowserRouter>
-          <Suspense fallback={<LoadingSpinner fullScreen message="加载中..." />}>
+          <Suspense fallback={<LoadingSpinner fullScreen message={t('common.loading')} />}>
             <Routes>
               {/* Public routes */}
               <Route path="/login" element={<LoginPage />} />

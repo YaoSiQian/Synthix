@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { chemicalsApi } from '@/api';
 import { useUIStore } from '@/store';
 import type { ChemicalCreate } from '@/types';
@@ -28,6 +29,7 @@ export const useChemicalSearch = (query: string, skip = 0, limit = 100) => {
 };
 
 export const useCreateChemical = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const addNotification = useUIStore((s) => s.addNotification);
   
@@ -37,21 +39,22 @@ export const useCreateChemical = () => {
       queryClient.invalidateQueries({ queryKey: ['chemicals'] });
       addNotification({
         type: 'success',
-        title: '添加成功',
-        message: `化学品 ${newChemical.molecular_formula} 已添加到库中`,
+        title: t('chemicalsApi.addSuccess'),
+        message: `${t('chemicalsApi.chemical')} ${newChemical.molecular_formula} ${t('chemicalsApi.addedToLibrary')}`,
       });
     },
     onError: (error: { message?: string }) => {
       addNotification({
         type: 'error',
-        title: '添加失败',
-        message: error.message || '无法添加化学品',
+        title: t('chemicalsApi.addFailed'),
+        message: error.message || t('chemicalsApi.cannotAddChemical'),
       });
     },
   });
 };
 
 export const useDeleteChemical = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const addNotification = useUIStore((s) => s.addNotification);
   
@@ -61,15 +64,15 @@ export const useDeleteChemical = () => {
       queryClient.invalidateQueries({ queryKey: ['chemicals'] });
       addNotification({
         type: 'success',
-        title: '删除成功',
-        message: '化学品已从库中移除',
+        title: t('chemicalsApi.deleteSuccess'),
+        message: t('chemicalsApi.removedFromLibrary'),
       });
     },
     onError: (error: { message?: string }) => {
       addNotification({
         type: 'error',
-        title: '删除失败',
-        message: error.message || '无法删除化学品',
+        title: t('chemicalsApi.deleteFailed'),
+        message: error.message || t('chemicalsApi.cannotDeleteChemical'),
       });
     },
   });

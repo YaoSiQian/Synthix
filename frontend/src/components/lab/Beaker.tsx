@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, keyframes } from '@mui/material';
+import { Box, keyframes, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { colors, environmentColors } from '@/theme';
 import type { Environment, Effect } from '@/types';
 
@@ -46,6 +47,7 @@ export const Beaker: React.FC<BeakerProps> = ({
   effects = [],
   onDrop,
 }) => {
+  const { t } = useTranslation();
   const envColor = environmentColors[environment] || colors.primary;
   const liquidHeight = Math.min(reactantCount * 15 + 20, 70);
   
@@ -241,13 +243,10 @@ export const Beaker: React.FC<BeakerProps> = ({
               fontWeight: 500,
             }}
           >
-            拖放化学品到此处
+            {t('lab.dropHere')}
           </Typography>
         </Box>
       )}
     </Box>
   );
 };
-
-// Need to import Typography for the drop zone text
-import { Typography } from '@mui/material';

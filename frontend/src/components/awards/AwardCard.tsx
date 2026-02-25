@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent, Box, Typography, Chip, LinearProgress } from '@mui/material';
 import { Lock } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { colors, tierColors, tierLabels, awardCategoryLabels } from '@/theme';
 import type { UserAwardSchema, AvailableAwardSchema, AwardCategory } from '@/types';
 
@@ -26,6 +27,7 @@ const categoryIcons: Record<AwardCategory, string> = {
 };
 
 export const AwardCard: React.FC<AwardCardProps> = ({ award, variant = 'default' }) => {
+  const { t } = useTranslation();
   const isUserAward = 'granted_at' in award;
   const tier = isUserAward ? (award as UserAwardSchema).tier : 0;
   const category = isUserAward
@@ -178,7 +180,7 @@ export const AwardCard: React.FC<AwardCardProps> = ({ award, variant = 'default'
           <Box sx={{ mt: 2 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
               <Typography variant="caption" sx={{ color: colors.onSurfaceVariant, fontWeight: 500 }}>
-                进度
+                {t('awards.progress')}
               </Typography>
               <Typography variant="caption" sx={{ color: colors.primary, fontWeight: 600 }}>
                 {current} / {target}
@@ -268,7 +270,7 @@ export const AwardCard: React.FC<AwardCardProps> = ({ award, variant = 'default'
             </Typography>
             {'granted_at' in award && (
               <Typography variant="caption" sx={{ color: colors.onSurfaceVariant }}>
-                获得于 {new Date(award.granted_at).toLocaleDateString('zh-CN')}
+                {t('awards.unlockedOn', { date: new Date(award.granted_at).toLocaleDateString() })}
               </Typography>
             )}
           </Box>

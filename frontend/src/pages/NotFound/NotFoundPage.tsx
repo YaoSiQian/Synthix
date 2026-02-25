@@ -6,10 +6,12 @@ import {
 } from '@mui/material';
 import { Home, Science } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { colors } from '@/theme';
 
 const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   return (
     <Box
@@ -90,7 +92,7 @@ const NotFoundPage: React.FC = () => {
           textAlign: 'center',
         }}
       >
-        页面未找到
+        {t('notFound.title')}
       </Typography>
       
       <Typography
@@ -102,7 +104,7 @@ const NotFoundPage: React.FC = () => {
           maxWidth: 400,
         }}
       >
-        抱歉，你访问的页面不存在。可能已被移动或删除。
+        {t('notFound.sorry')}，{t('notFound.pageNotExist')}。{t('notFound.movedOrDeleted')}
       </Typography>
       
       <Box sx={{ display: 'flex', gap: 2 }}>
@@ -123,7 +125,7 @@ const NotFoundPage: React.FC = () => {
             },
           }}
         >
-          返回实验室
+          {t('notFound.returnToLab')}
         </Button>
         <Button
           variant="outlined"
@@ -143,7 +145,7 @@ const NotFoundPage: React.FC = () => {
             },
           }}
         >
-          返回上一页
+          {t('notFound.returnBack')}
         </Button>
       </Box>
     </Box>

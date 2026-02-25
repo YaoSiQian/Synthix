@@ -13,6 +13,7 @@ import {
   Chip,
 } from '@mui/material';
 import { EmojiEvents, MilitaryTech } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { colors, tierColors } from '@/theme';
 import type { LeaderboardEntrySchema } from '@/types';
 
@@ -37,6 +38,8 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
   entries,
   highlightUserId,
 }) => {
+  const { t } = useTranslation();
+  
   return (
     <TableContainer
       component={Paper}
@@ -50,13 +53,13 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
       <Table>
         <TableHead>
           <TableRow sx={{ backgroundColor: colors.surfaceContainerHigh }}>
-            <TableCell sx={{ fontWeight: 600, color: colors.onSurface, width: 80 }}>排名</TableCell>
-            <TableCell sx={{ fontWeight: 600, color: colors.onSurface }}>用户</TableCell>
+            <TableCell sx={{ fontWeight: 600, color: colors.onSurface, width: 80 }}>{t('leaderboard.rank')}</TableCell>
+            <TableCell sx={{ fontWeight: 600, color: colors.onSurface }}>{t('leaderboard.user')}</TableCell>
             <TableCell sx={{ fontWeight: 600, color: colors.onSurface, textAlign: 'center' }}>
-              奖励数
+              {t('leaderboard.awards')}
             </TableCell>
             <TableCell sx={{ fontWeight: 600, color: colors.onSurface, textAlign: 'right' }}>
-              总积分
+              {t('leaderboard.points')}
             </TableCell>
           </TableRow>
         </TableHead>

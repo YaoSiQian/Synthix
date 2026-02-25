@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { colors } from '@/theme';
 
 interface LoadingSpinnerProps {
@@ -9,10 +10,13 @@ interface LoadingSpinnerProps {
 }
 
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
-  message = '加载中...',
+  message,
   size = 48,
   fullScreen = false,
 }) => {
+  const { t } = useTranslation();
+  const displayMessage = message || t('common.loading');
+  
   const content = (
     <Box
       sx={{
@@ -29,12 +33,12 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
           color: colors.primary,
         }}
       />
-      {message && (
+      {displayMessage && (
         <Typography
           variant="body2"
           sx={{ color: colors.onSurfaceVariant, fontWeight: 500 }}
         >
-          {message}
+          {displayMessage}
         </Typography>
       )}
     </Box>

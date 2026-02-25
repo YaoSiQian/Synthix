@@ -13,7 +13,9 @@
     "all": "全部",
     "noData": "暂无数据",
     "retry": "重试",
-    "showing": "显示"
+    "showing": "显示",
+    "back": "返回",
+    "close": "关闭"
   },
   "nav": {
     "lab": "实验室",
@@ -122,7 +124,8 @@
     "dragHint": "拖拽化学品到此处",
     "selectChemical": "从下方选择化学品",
     "noReactants": "请添加反应物",
-    "atLeastTwo": "请至少添加2个反应物"
+    "atLeastTwo": "请至少添加2个反应物",
+    "dropHere": "拖放化学品到此处"
   },
   "chemicals": {
     "title": "化学品库",
@@ -138,7 +141,9 @@
     "cas": "CAS号",
     "mw": "分子量",
     "state": "物态",
-    "dragToAdd": "拖拽添加到反应"
+    "dragToAdd": "拖拽添加到反应",
+    "unknown": "未知化合物",
+    "density": "密度"
   },
   "awards": {
     "title": "奖励中心",
@@ -159,7 +164,10 @@
     "database": "数据库贡献",
     "community": "社区",
     "special": "特殊",
-    "achievement": "成就"
+    "achievement": "成就",
+    "loading": "加载奖励中...",
+    "allUnlocked": "所有奖励已解锁",
+    "congratsUnlocked": "恭喜你解锁了所有可用奖励"
   },
   "leaderboard": {
     "title": "排行榜",
@@ -173,7 +181,11 @@
     "allTime": "总榜",
     "weekly": "本周",
     "monthly": "本月",
-    "noData": "暂无排行数据"
+    "noData": "暂无排行数据",
+    "yourRank": "你的排名",
+    "totalAwards": "个奖励",
+    "loading": "加载排行榜...",
+    "empty": "排行榜数据为空"
   },
   "profile": {
     "title": "个人资料",
@@ -187,7 +199,25 @@
     "totalPoints": "总积分",
     "currentRank": "当前排名",
     "settings": "设置",
-    "language": "语言"
+    "language": "语言",
+    "experiments": "次实验",
+    "reactions": "个奖励",
+    "rank": "排名",
+    "cancel": "取消",
+    "edit": "编辑",
+    "totalReactionsStat": "总反应次数",
+    "discoveriesStat": "发现次数",
+    "awardsStat": "奖励数量",
+    "pointsStat": "总积分",
+    "accountInfo": "账户信息",
+    "usernameField": "用户名",
+    "emailField": "邮箱",
+    "saveChanges": "保存更改",
+    "registerTime": "注册时间",
+    "accountStatus": "账户状态",
+    "active": "活跃",
+    "disabled": "已禁用",
+    "normal": "正常"
   },
   "notifications": {
     "inputError": "输入错误",
@@ -203,7 +233,8 @@
     "networkError": "网络错误，请稍后重试",
     "unknownError": "发生错误，请稍后重试",
     "unauthorized": "请先登录",
-    "notFound": "未找到"
+    "notFound": "未找到",
+    "network": "网络错误"
   },
   "environments": {
     "Earth (Normal)": "标准大气条件",
@@ -212,5 +243,101 @@
     "Inert Gas": "惰性气体环境",
     "Acidic Environment": "低pH环境",
     "Basic Environment": "高pH环境"
+  },
+  "effects": {
+    "gasProduction": "气体产生",
+    "intensity": "强度",
+    "duration": "持续",
+    "lightEmission": "光发射",
+    "lightPhenomenon": "发光现象",
+    "radius": "半径",
+    "temperatureChange": "温度变化",
+    "exothermic": "放热反应",
+    "endothermic": "吸热反应",
+    "change": "变化",
+    "foamProduction": "泡沫产生",
+    "bubbles": "气泡",
+    "density": "密度",
+    "stability": "稳定",
+    "stateChange": "状态变化",
+    "stateTransition": "物态转变",
+    "finalState": "最终状态",
+    "volumeChange": "体积变化",
+    "expansion": "膨胀",
+    "contraction": "收缩",
+    "factor": "变化倍数",
+    "spill": "溢出",
+    "liquidSpill": "液体溢出",
+    "amount": "溢出量",
+    "spread": "扩散",
+    "textureChange": "质地变化",
+    "viscosity": "粘度",
+    "unknownEffect": "未知效果",
+    "worldFirstDiscovery": "世界首次发现",
+    "firstDiscoverer": "你是第一个发现这个反应的人",
+    "reactionResult": "反应结果",
+    "productCount": "种产物",
+    "effectCount": "种效果",
+    "product": "产物",
+    "soluble": "可溶",
+    "addToBench": "添加到实验台",
+    "phenomena": "实验现象",
+    "default": "默认",
+    "seconds": "秒",
+    "meters": "米",
+    "seconds2": "秒",
+    "seconds3": "秒",
+    "represents": "表示"
+  },
+  "chemicalsApi": {
+    "addSuccess": "添加成功",
+    "chemical": "化学品",
+    "addedToLibrary": "已添加到库中",
+    "addFailed": "添加失败",
+    "cannotAddChemical": "无法添加化学品",
+    "deleteSuccess": "删除成功",
+    "removedFromLibrary": "化学品已从库中移除",
+    "deleteFailed": "删除失败",
+    "cannotDeleteChemical": "无法删除化学品"
+  },
+  "reactionsApi": {
+    "worldFirstDiscovery": "世界首次发现",
+    "firstDiscoverer": "你是第一个发现这个反应的人",
+    "reactionComplete": "反应完成",
+    "generated": "生成了",
+    "productCount": "种产物",
+    "reactionFailed": "反应失败",
+    "cannotProceed": "无法进行反应"
+  },
+  "tier": {
+    "bronze": "青铜",
+    "silver": "白银",
+    "gold": "黄金"
+  },
+  "awardCategory": {
+    "discovery": "发现",
+    "database_contribution": "数据库贡献",
+    "community": "社区",
+    "special": "特殊",
+    "achievement": "成就"
+  },
+  "chemicalTypes": {
+    "optional": "可选",
+    "helpIdentify": "帮助识别化合物"
+  },
+  "notFound": {
+    "title": "页面未找到",
+    "sorry": "抱歉",
+    "pageNotExist": "你访问的页面不存在",
+    "movedOrDeleted": "可能已被移动或删除",
+    "returnToLab": "返回实验室",
+    "returnBack": "返回上一页"
+  },
+  "emptyState": {
+    "noData": "暂无数据",
+    "noContent": "这里还没有任何内容"
+  },
+  "loading": {
+    "loading": "加载中"
   }
 }

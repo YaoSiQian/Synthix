@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import { SentimentDissatisfied, Add } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { colors } from '@/theme';
 
 interface EmptyStateProps {
@@ -13,13 +14,17 @@ interface EmptyStateProps {
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
-  title = '暂无数据',
-  message = '这里还没有任何内容',
+  title,
+  message,
   icon = <SentimentDissatisfied sx={{ fontSize: 64, color: colors.onSurfaceVariant }} />,
   actionLabel,
   onAction,
   compact = false,
 }) => {
+  const { t } = useTranslation();
+  const displayTitle = title || t('emptyState.noData');
+  const displayMessage = message || t('emptyState.noContent');
+  
   return (
     <Box
       sx={{
@@ -42,7 +47,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           fontSize: compact ? '1.125rem' : '1.25rem',
         }}
       >
-        {title}
+        {displayTitle}
       </Typography>
       <Typography
         variant="body2"
@@ -53,7 +58,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
           fontSize: compact ? '0.875rem' : '1rem',
         }}
       >
-        {message}
+        {displayMessage}
       </Typography>
       {actionLabel && onAction && (
         <Button

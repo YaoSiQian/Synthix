@@ -13,7 +13,9 @@
     "all": "All",
     "noData": "No data",
     "retry": "Retry",
-    "showing": "Showing"
+    "showing": "Showing",
+    "back": "Back",
+    "close": "Close"
   },
   "nav": {
     "lab": "Lab",
@@ -122,7 +124,8 @@
     "dragHint": "Drag chemicals here",
     "selectChemical": "Select chemicals below",
     "noReactants": "Please add reactants",
-    "atLeastTwo": "Please add at least 2 reactants"
+    "atLeastTwo": "Please add at least 2 reactants",
+    "dropHere": "Drop chemicals here"
   },
   "chemicals": {
     "title": "Chemical Library",
@@ -138,7 +141,9 @@
     "cas": "CAS Number",
     "mw": "Molecular Weight",
     "state": "State",
-    "dragToAdd": "Drag to add to reaction"
+    "dragToAdd": "Drag to add to reaction",
+    "unknown": "Unknown compound",
+    "density": "Density"
   },
   "awards": {
     "title": "Awards",
@@ -159,7 +164,10 @@
     "database": "Database Contribution",
     "community": "Community",
     "special": "Special",
-    "achievement": "Achievement"
+    "achievement": "Achievement",
+    "loading": "Loading awards...",
+    "allUnlocked": "All awards unlocked",
+    "congratsUnlocked": "Congratulations! You've unlocked all available awards"
   },
   "leaderboard": {
     "title": "Leaderboard",
@@ -173,7 +181,11 @@
     "allTime": "All Time",
     "weekly": "This Week",
     "monthly": "This Month",
-    "noData": "No leaderboard data"
+    "noData": "No leaderboard data",
+    "yourRank": "Your rank",
+    "totalAwards": "awards",
+    "loading": "Loading leaderboard...",
+    "empty": "Leaderboard is empty"
   },
   "profile": {
     "title": "Profile",
@@ -187,7 +199,25 @@
     "totalPoints": "Total Points",
     "currentRank": "Current Rank",
     "settings": "Settings",
-    "language": "Language"
+    "language": "Language",
+    "experiments": "experiments",
+    "reactions": "awards",
+    "rank": "Rank",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "totalReactionsStat": "Total Reactions",
+    "discoveriesStat": "Discoveries",
+    "awardsStat": "Awards",
+    "pointsStat": "Total Points",
+    "accountInfo": "Account Information",
+    "usernameField": "Username",
+    "emailField": "Email",
+    "saveChanges": "Save Changes",
+    "registerTime": "Registration Time",
+    "accountStatus": "Account Status",
+    "active": "Active",
+    "disabled": "Disabled",
+    "normal": "Normal"
   },
   "notifications": {
     "inputError": "Input Error",
@@ -203,7 +233,8 @@
     "networkError": "Network error, please try again later",
     "unknownError": "An error occurred, please try again later",
     "unauthorized": "Please login first",
-    "notFound": "Not found"
+    "notFound": "Not found",
+    "network": "Network error"
   },
   "environments": {
     "Earth (Normal)": "Standard atmospheric conditions",
@@ -212,5 +243,101 @@
     "Inert Gas": "Inert gas environment",
     "Acidic Environment": "Low pH environment",
     "Basic Environment": "High pH environment"
+  },
+  "effects": {
+    "gasProduction": "Gas Production",
+    "intensity": "Intensity",
+    "duration": "Duration",
+    "lightEmission": "Light Emission",
+    "lightPhenomenon": "Luminous phenomenon",
+    "radius": "Radius",
+    "temperatureChange": "Temperature Change",
+    "exothermic": "Exothermic reaction",
+    "endothermic": "Endothermic reaction",
+    "change": "Change",
+    "foamProduction": "Foam Production",
+    "bubbles": "Bubbles",
+    "density": "Density",
+    "stability": "Stability",
+    "stateChange": "State Change",
+    "stateTransition": "State transition",
+    "finalState": "Final State",
+    "volumeChange": "Volume Change",
+    "expansion": "Expansion",
+    "contraction": "Contraction",
+    "factor": "Factor",
+    "spill": "Spill",
+    "liquidSpill": "Liquid spill",
+    "amount": "Amount",
+    "spread": "Spread",
+    "textureChange": "Texture Change",
+    "viscosity": "Viscosity",
+    "unknownEffect": "Unknown effect",
+    "worldFirstDiscovery": "World First Discovery!",
+    "firstDiscoverer": "You are the first to discover this reaction",
+    "reactionResult": "Reaction Result",
+    "productCount": "products",
+    "effectCount": "effects",
+    "product": "Product",
+    "soluble": "Soluble",
+    "addToBench": "Add to bench",
+    "phenomena": "Phenomena",
+    "default": "Default",
+    "seconds": "seconds",
+    "meters": "meters",
+    "seconds2": "seconds",
+    "seconds3": "seconds",
+    "represents": "represents"
+  },
+  "chemicalsApi": {
+    "addSuccess": "Added Successfully",
+    "chemical": "Chemical",
+    "addedToLibrary": "has been added to library",
+    "addFailed": "Add Failed",
+    "cannotAddChemical": "Cannot add chemical",
+    "deleteSuccess": "Deleted Successfully",
+    "removedFromLibrary": "Chemical removed from library",
+    "deleteFailed": "Delete Failed",
+    "cannotDeleteChemical": "Cannot delete chemical"
+  },
+  "reactionsApi": {
+    "worldFirstDiscovery": "World First Discovery!",
+    "firstDiscoverer": "You are the first to discover this reaction",
+    "reactionComplete": "Reaction Complete",
+    "generated": "Generated",
+    "productCount": "products",
+    "reactionFailed": "Reaction Failed",
+    "cannotProceed": "Cannot proceed with reaction"
+  },
+  "tier": {
+    "bronze": "Bronze",
+    "silver": "Silver",
+    "gold": "Gold"
+  },
+  "awardCategory": {
+    "discovery": "Discovery",
+    "database_contribution": "Database Contribution",
+    "community": "Community",
+    "special": "Special",
+    "achievement": "Achievement"
+  },
+  "chemicalTypes": {
+    "optional": "Optional",
+    "helpIdentify": "Helps identify compound"
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "sorry": "Sorry",
+    "pageNotExist": "The page you're looking for doesn't exist",
+    "movedOrDeleted": "It may have been moved or deleted",
+    "returnToLab": "Return to Lab",
+    "returnBack": "Go Back"
+  },
+  "emptyState": {
+    "noData": "No data",
+    "noContent": "There's nothing here yet"
+  },
+  "loading": {
+    "loading": "Loading"
   }
 }

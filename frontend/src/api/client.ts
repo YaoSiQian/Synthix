@@ -1,4 +1,5 @@
 import axios, { AxiosError } from 'axios';
+import i18n from '@/i18n';
 import { useAuthStore } from '@/store/authStore';
 
 // API Error interface
@@ -32,7 +33,7 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError<APIError>) => {
     const status = error.response?.status || 500;
-    const message = error.response?.data?.detail || '网络错误';
+    const message = error.response?.data?.detail || i18n.t('errors.network');
     
     // Handle 401 - Unauthorized
     if (status === 401) {

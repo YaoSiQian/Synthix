@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { reactionsApi } from '@/api';
 import { useLabStore, useUIStore } from '@/store';
 import type { ReactionRequest } from '@/types';
@@ -20,6 +21,7 @@ export const useReactionCache = () => {
 };
 
 export const useRunReaction = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const addNotification = useUIStore((s) => s.addNotification);
   const setLastReaction = useLabStore((s) => s.setLastReaction);
@@ -47,14 +49,14 @@ export const useRunReaction = () => {
       if (result.is_world_first) {
         addNotification({
           type: 'success',
-          title: '🎉 世界首次发现！',
-          message: '你是第一个发现这个反应的人！',
+          title: t('reactionsApi.worldFirstDiscovery'),
+          message: t('reactionsApi.firstDiscoverer'),
         });
       } else {
         addNotification({
           type: 'success',
-          title: '反应完成',
-          message: `生成了 ${result.products.length} 种产物`,
+          title: t('reactionsApi.reactionComplete'),
+          message: `${t('reactionsApi.generated')} ${result.products.length} ${t('reactionsApi.productCount')}`,
         });
       }
     },
@@ -62,8 +64,8 @@ export const useRunReaction = () => {
       setIsReacting(false);
       addNotification({
         type: 'error',
-        title: '反应失败',
-        message: error.message || '无法进行反应',
+        title: t('reactionsApi.reactionFailed'),
+        message: error.message || t('reactionsApi.cannotProceed'),
       });
     },
   });

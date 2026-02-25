@@ -116,7 +116,7 @@ const RegisterPage: React.FC = () => {
               placeholder={t('auth.chooseUsername')}
               {...register('username')}
               error={!!errors.username}
-              helperText={errors.username?.message as string}
+              helperText={errors.username ? t(errors.username.message as string) : undefined}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -139,7 +139,7 @@ const RegisterPage: React.FC = () => {
               placeholder={t('auth.enterEmail')}
               {...register('email')}
               error={!!errors.email}
-              helperText={errors.email?.message as string}
+              helperText={errors.email ? t(errors.email.message as string) : undefined}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -162,7 +162,7 @@ const RegisterPage: React.FC = () => {
               placeholder={t('auth.setPassword')}
               {...register('password')}
               error={!!errors.password}
-              helperText={errors.password?.message as string}
+              helperText={errors.password ? t(errors.password.message as string) : undefined}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -195,7 +195,7 @@ const RegisterPage: React.FC = () => {
               placeholder={t('auth.enterPasswordAgain')}
               {...register('confirmPassword')}
               error={!!errors.confirmPassword}
-              helperText={errors.confirmPassword?.message as string}
+              helperText={errors.confirmPassword ? t(errors.confirmPassword.message as string) : undefined}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
