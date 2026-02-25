@@ -5,12 +5,11 @@ Handles criteria checking, tier calculation, and progress tracking for awards.
 """
 
 from typing import Dict, Any, List, Optional, Tuple
-from sqlmodel import Session, select, func
+from sqlmodel import Session, select, func, desc
 from datetime import datetime, timedelta
 
 from app.models.award import AwardTemplate, UserAward, AwardCategory
 from app.models.reaction import ReactionCache, Discovery
-from app.models.debug import DeletionRequest
 from app.models.user import User
 
 
@@ -68,14 +67,10 @@ class AwardEvaluator:
             return await self._check_debug_submissions_criteria(criteria, user_stats)
         elif criteria_type == "correction_accuracy":
             return await self._check_correction_accuracy_criteria(criteria, user_stats)
-        elif criteria_type == "data_quality_impact":
-            return await self._check_data_quality_impact_criteria(criteria, user_stats)
         elif criteria_type == "profile_completeness":
             return await self._check_profile_completeness_criteria(criteria, user_stats)
         elif criteria_type == "consecutive_days":
             return await self._check_consecutive_days_criteria(criteria, user_stats)
-        elif criteria_type == "help_others":
-            return await self._check_help_others_criteria(criteria, user_stats)
         else:
             raise AwardEvaluationError(f"Unknown criteria type: {criteria_type}")
     
@@ -229,32 +224,12 @@ class AwardEvaluator:
                 stats["complexity"] = 0
                 
         elif criteria_type == "debug_submissions":
-            # Count debug submissions by user
-            debug_count = self.db.exec(
-                select(func.count(DeletionRequest.id))
-                .where(DeletionRequest.status == "completed")  # Assuming completed submissions
-            ).first() or 0
-            stats["count"] = debug_count
+            stats["count"] = 0
             
         elif criteria_type == "correction_accuracy":
-            # Calculate accuracy of debug submissions
-            total_submissions = self.db.exec(
-                select(func.count(DeletionRequest.id))
-            ).first() or 0
-            
-            successful_submissions = self.db.exec(
-                select(func.count(DeletionRequest.id))
-                .where(DeletionRequest.status == "completed")
-            ).first() or 0
-            
-            if total_submissions > 0:
-                accuracy = (successful_submissions / total_submissions) * 100.0
-            else:
-                accuracy = 0.0
-            
-            stats["accuracy_percentage"] = accuracy
-            stats["total_submissions"] = total_submissions
-            stats["successful_submissions"] = successful_submissions
+            stats["accuracy_percentage"] = 0.0
+            stats["total_submissions"] = 0
+            stats["successful_submissions"] = 0
             
         elif criteria_type == "data_quality_impact":
             # Placeholder for data quality impact calculation
@@ -343,16 +318,6 @@ class AwardEvaluator:
         # Require minimum number of submissions for accuracy calculation
         return total_submissions >= min_submissions and accuracy >= threshold
     
-    async def _check_data_quality_impact_criteria(
-        self, 
-        criteria: Dict[str, Any], 
-        user_stats: Dict[str, Any]
-    ) -> bool:
-        """Check data quality impact criteria."""
-        threshold = criteria.get("threshold", 1)
-        impact_score = user_stats.get("impact_score", 0)
-        return impact_score >= threshold
-    
     async def _check_profile_completeness_criteria(
         self, 
         criteria: Dict[str, Any], 
@@ -373,16 +338,6 @@ class AwardEvaluator:
         consecutive_days = user_stats.get("count", 0)
         return consecutive_days >= threshold
     
-    async def _check_help_others_criteria(
-        self, 
-        criteria: Dict[str, Any], 
-        user_stats: Dict[str, Any]
-    ) -> bool:
-        """Check help others criteria."""
-        threshold = criteria.get("threshold", 1)
-        help_score = user_stats.get("help_score", 0)
-        return help_score >= threshold
-    
     def _calculate_profile_completeness(self, user: User) -> float:
         """Calculate user profile completeness percentage."""
         total_fields = 3  # username, email, and assuming some profile fields
@@ -399,21 +354,22 @@ class AwardEvaluator:
     
     async def _calculate_consecutive_days(self, user_id: int) -> int:
         """Calculate consecutive days of user activity."""
-        # Get recent reaction cache entries to determine activity
         recent_reactions = self.db.exec(
             select(ReactionCache.created_at)
             .where(ReactionCache.user_id == user_id)
-            .order_by(ReactionCache.created_at.desc())
-            .limit(30)  # Look at last 30 days
+            .order_by(desc(ReactionCache.created_at))
+            .limit(30)
         ).all()
         
         if not recent_reactions:
             return 0
         
-        # Convert to dates and count consecutive days
         activity_dates = set()
         for reaction in recent_reactions:
-            activity_dates.add(reaction.date())
+            if hasattr(reaction, 'date'):
+                activity_dates.add(reaction.date())
+            else:
+                activity_dates.add(reaction)
         
         # Sort dates in descending order
         sorted_dates = sorted(activity_dates, reverse=True)

@@ -9,7 +9,6 @@ class UserBase(SQLModel):
     email: str = Field(unique=True, index=True, max_length=255)
     is_active: bool = Field(default=True)
     is_admin: bool = Field(default=False, description="Admin user with management privileges")
-    public_profile: bool = Field(default=False, description="Allow public viewing of awards")
 
 
 class User(UserBase, table=True):

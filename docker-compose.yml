@@ -26,7 +26,6 @@ services:
       - PUBCHEM_TIMEOUT=10
       - APP_NAME=Chemezy Backend Engine
       - DEBUG=false
-      - REDIS_URL=redis://localhost:6379/0
       - OPENAI_API_KEY=your-api-key-here
       - OPENAI_API_BASE=https://api.your-provider.com/v1
       - OPENAI_MODEL_NAME=gpt-4o-mini

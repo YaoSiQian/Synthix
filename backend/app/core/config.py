@@ -34,9 +34,6 @@ class Settings(BaseSettings):
     debug: bool = False
     testing: bool = False
 
-    # Rate limiting (optional - for future enhancement)
-    redis_url: Optional[str] = None
-
     pubchem_retries: int = 3
     dspy_retries: int = 3
 

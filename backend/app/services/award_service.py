@@ -6,7 +6,7 @@ Main orchestrator for award operations including evaluation, granting, retrieval
 
 from typing import List, Optional, Dict, Any, Tuple
 from sqlmodel import Session, select, and_, or_, desc, asc, func
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 
 from app.models.award import AwardTemplate, UserAward, AwardCategory
@@ -14,6 +14,7 @@ from app.models.user import User
 from app.models.audit_log import AuditAction
 from app.services.award_evaluator import AwardEvaluator, AwardEvaluationError
 from app.services.award_template_service import AwardTemplateService
+from app.services.cache_service import award_cache
 
 
 logger = logging.getLogger(__name__)
@@ -118,74 +119,6 @@ class AwardService:
         except Exception as e:
             logger.error(f"Discovery award evaluation failed for user {user_id}: {e}")
             raise AwardServiceError(f"Discovery award evaluation failed: {e}")
-    
-    async def evaluate_debug_contribution_awards(
-        self, 
-        user_id: int, 
-        contribution_type: str,
-        context: Optional[Dict[str, Any]] = None
-    ) -> List[UserAward]:
-        """
-        Evaluate and grant debug contribution awards for a user.
-        
-        Args:
-            user_id: ID of the user to evaluate
-            contribution_type: Type of contribution (e.g., "chemical_correction")
-            context: Additional context data
-            
-        Returns:
-            List of newly granted awards
-            
-        Raises:
-            AwardServiceError: If evaluation fails
-        """
-        try:
-            # Get all active database contribution award templates
-            templates = await self.template_service.get_templates(
-                category=AwardCategory.DATABASE_CONTRIBUTION,
-                active_only=True
-            )
-            
-            granted_awards = []
-            evaluation_context = context or {}
-            evaluation_context["contribution_type"] = contribution_type
-            
-            for template in templates:
-                try:
-                    # Check if user already has this award
-                    existing_award = await self._get_user_award(user_id, template.id)
-                    
-                    # Check if criteria are met
-                    criteria_met = await self.evaluator.check_criteria(
-                        template, user_id, evaluation_context
-                    )
-                    
-                    if criteria_met:
-                        if existing_award:
-                            # Check for tier upgrade
-                            upgraded_award = await self._check_tier_upgrade(
-                                existing_award, template, user_id, evaluation_context
-                            )
-                            if upgraded_award:
-                                granted_awards.append(upgraded_award)
-                        else:
-                            # Grant new award
-                            new_award = await self.grant_award(
-                                user_id, template.id, evaluation_context
-                            )
-                            granted_awards.append(new_award)
-                            
-                except Exception as e:
-                    logger.warning(
-                        f"Failed to evaluate template {template.id} for user {user_id}: {e}"
-                    )
-                    continue
-            
-            return granted_awards
-            
-        except Exception as e:
-            logger.error(f"Debug contribution award evaluation failed for user {user_id}: {e}")
-            raise AwardServiceError(f"Debug contribution award evaluation failed: {e}")
     
     async def grant_award(
         self, 
@@ -717,3 +650,200 @@ class AwardService:
         except Exception as e:
             logger.warning(f"Failed to check tier upgrade: {e}")
             return None
+
+    async def get_recent_awards(
+        self,
+        user_id: int,
+        limit: int = 10,
+        days_back: int = 7
+    ) -> List[Dict[str, Any]]:
+        """Get user's recent awards for dashboard display."""
+        try:
+            cutoff_date = datetime.utcnow() - timedelta(days=days_back)
+            
+            query = (
+                select(UserAward, AwardTemplate)
+                .join(AwardTemplate, UserAward.template_id == AwardTemplate.id)
+                .where(
+                    UserAward.user_id == user_id,
+                    UserAward.granted_at >= cutoff_date
+                )
+                .order_by(desc(UserAward.granted_at))
+                .limit(limit)
+            )
+            
+            results = self.db.exec(query).all()
+            
+            recent_awards = []
+            for user_award, template in results:
+                award_info = {
+                    "id": user_award.id,
+                    "template_id": template.id,
+                    "template_name": template.name,
+                    "description": template.description,
+                    "category": template.category,
+                    "tier": user_award.tier,
+                    "granted_at": user_award.granted_at,
+                    "metadata": template.award_metadata,
+                    "is_new": (datetime.utcnow() - user_award.granted_at).days <= 1
+                }
+                recent_awards.append(award_info)
+            
+            return recent_awards
+            
+        except Exception as e:
+            logger.error(f"Failed to get recent awards for user {user_id}: {e}")
+            raise AwardServiceError(f"Failed to get recent awards: {e}")
+    
+    async def get_award_progress(self, user_id: int) -> Dict[str, Any]:
+        """Get user's progress toward unearned awards."""
+        try:
+            active_templates = self.db.exec(
+                select(AwardTemplate).where(AwardTemplate.is_active == True)
+            ).all()
+            
+            user_awards = self.db.exec(
+                select(UserAward).where(UserAward.user_id == user_id)
+            ).all()
+            
+            earned_template_ids = {award.template_id for award in user_awards}
+            
+            progress_info = {
+                "total_awards_available": len(active_templates),
+                "total_awards_earned": len(user_awards),
+                "progress_percentage": (len(user_awards) / len(active_templates)) * 100 if active_templates else 0,
+                "category_progress": {},
+                "next_awards": []
+            }
+            
+            category_counts = {}
+            for template in active_templates:
+                category = template.category
+                if category not in category_counts:
+                    category_counts[category] = {"total": 0, "earned": 0}
+                category_counts[category]["total"] += 1
+                
+                if template.id in earned_template_ids:
+                    category_counts[category]["earned"] += 1
+                else:
+                    progress_info["next_awards"].append({
+                        "template_id": template.id,
+                        "name": template.name,
+                        "description": template.description,
+                        "category": category.value,
+                        "estimated_progress": 0,
+                        "metadata": template.award_metadata
+                    })
+            
+            for category, counts in category_counts.items():
+                progress_info["category_progress"][category.value] = {
+                    "earned": counts["earned"],
+                    "total": counts["total"],
+                    "percentage": (counts["earned"] / counts["total"]) * 100 if counts["total"] > 0 else 0
+                }
+            
+            progress_info["next_awards"] = progress_info["next_awards"][:5]
+            
+            return progress_info
+            
+        except Exception as e:
+            logger.error(f"Failed to get award progress for user {user_id}: {e}")
+            raise AwardServiceError(f"Failed to get award progress: {e}")
+    
+    async def get_dashboard_stats(self, user_id: int) -> Dict[str, Any]:
+        """Get comprehensive dashboard statistics for a user."""
+        try:
+            user_awards = self.db.exec(
+                select(UserAward).where(UserAward.user_id == user_id)
+            ).all()
+            
+            recent_awards = await self.get_recent_awards(user_id, limit=5)
+            progress_info = await self.get_award_progress(user_id)
+            
+            total_points = 0
+            category_stats = {}
+            tier_distribution = {}
+            
+            for award in user_awards:
+                template = self.db.exec(
+                    select(AwardTemplate).where(AwardTemplate.id == award.template_id)
+                ).first()
+                
+                if template:
+                    category = template.category.value
+                    tier = award.tier
+                    
+                    points = template.award_metadata.get('points', 10) * tier
+                    total_points += points
+                    
+                    if category not in category_stats:
+                        category_stats[category] = {"count": 0, "points": 0}
+                    category_stats[category]["count"] += 1
+                    category_stats[category]["points"] += points
+                    
+                    if tier not in tier_distribution:
+                        tier_distribution[tier] = 0
+                    tier_distribution[tier] += 1
+            
+            dashboard_stats = {
+                "total_awards": len(user_awards),
+                "total_points": total_points,
+                "recent_awards": recent_awards,
+                "category_breakdown": category_stats,
+                "tier_distribution": tier_distribution,
+                "progress": progress_info,
+                "achievements_this_week": len([a for a in recent_awards if a['is_new']]),
+                "next_milestones": progress_info["next_awards"]
+            }
+            
+            return dashboard_stats
+            
+        except Exception as e:
+            logger.error(f"Failed to get dashboard stats for user {user_id}: {e}")
+            raise AwardServiceError(f"Failed to get dashboard stats: {e}")
+    
+    async def get_award_notifications(
+        self,
+        user_id: int,
+        unread_only: bool = True
+    ) -> List[Dict[str, Any]]:
+        """Get award notifications for a user."""
+        try:
+            recent_awards = await self.get_recent_awards(user_id, limit=20, days_back=30)
+            
+            notifications = []
+            for award in recent_awards:
+                notification = {
+                    "id": f"award_{award['id']}",
+                    "type": "award_granted",
+                    "title": f"Award Earned: {award['template_name']}",
+                    "message": f"You earned the {award['template_name']} award (Tier {award['tier']})!",
+                    "timestamp": award['granted_at'],
+                    "read": not award['is_new'],
+                    "metadata": {
+                        "award_id": award['id'],
+                        "template_id": award['template_id'],
+                        "category": award['category'].value,
+                        "tier": award['tier']
+                    }
+                }
+                
+                if unread_only and notification['read']:
+                    continue
+                    
+                notifications.append(notification)
+            
+            return notifications
+            
+        except Exception as e:
+            logger.error(f"Failed to get notifications for user {user_id}: {e}")
+            raise AwardServiceError(f"Failed to get notifications: {e}")
+    
+    async def mark_notifications_read(
+        self,
+        user_id: int,
+        notification_ids: List[str]
+    ) -> bool:
+        """Mark notifications as read (placeholder - notifications derived from awards)."""
+        logger.info(f"Marked {len(notification_ids)} notifications as read for user {user_id}")
+        return True

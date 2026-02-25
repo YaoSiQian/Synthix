@@ -448,3 +448,155 @@ class LeaderboardService:
         if len(self._cache) > 100:
             oldest_key = min(self._cache.keys(), key=lambda k: self._cache[k][1])
             del self._cache[oldest_key]
+
+    async def get_category_leaderboard_paginated(
+        self,
+        category: AwardCategory,
+        page: int = 1,
+        page_size: int = 20
+    ) -> Dict[str, Any]:
+        """Get paginated leaderboard for a category."""
+        try:
+            cache_key = f"leaderboard_{category.value}_page_{page}_size_{page_size}"
+            
+            cached_result = self._get_cached_result(cache_key)
+            if cached_result:
+                return cached_result
+            
+            offset = (page - 1) * page_size
+            
+            query = (
+                select(
+                    UserAward.user_id,
+                    User.username,
+                    func.count(UserAward.id).label("award_count"),
+                    func.sum(
+                        func.coalesce(
+                            func.json_extract(AwardTemplate.award_metadata, "$.points"),
+                            0
+                        )
+                    ).label("total_points"),
+                    func.max(UserAward.granted_at).label("latest_award")
+                )
+                .join(AwardTemplate, UserAward.template_id == AwardTemplate.id)
+                .join(User, UserAward.user_id == User.id)
+                .where(
+                    and_(
+                        User.is_active == True,
+                        AwardTemplate.category == category
+                    )
+                )
+                .group_by(UserAward.user_id, User.username)
+                .order_by(
+                    desc("total_points"),
+                    desc("award_count"),
+                    desc("latest_award")
+                )
+            )
+            
+            count_query = select(func.count(func.distinct(UserAward.user_id))).select_from(query.subquery())
+            total = self.db.exec(count_query).first() or 0
+            
+            results = self.db.exec(query.offset(offset).limit(page_size)).all()
+            
+            leaderboard = []
+            base_rank = offset + 1
+            for i, (user_id, username, award_count, total_points, latest_award) in enumerate(results):
+                entry = {
+                    "rank": base_rank + i,
+                    "user_id": user_id,
+                    "username": username,
+                    "award_count": int(award_count or 0),
+                    "total_points": int(total_points or 0)
+                }
+                leaderboard.append(entry)
+            
+            result = {
+                "items": leaderboard,
+                "pagination": {
+                    "page": page,
+                    "page_size": page_size,
+                    "total": total,
+                    "total_pages": (total + page_size - 1) // page_size
+                }
+            }
+            
+            self._cache_result(cache_key, result)
+            return result
+            
+        except Exception as e:
+            logger.error(f"Failed to get paginated category leaderboard: {e}")
+            raise LeaderboardServiceError(f"Failed to get paginated leaderboard: {e}")
+    
+    async def get_overall_leaderboard_paginated(
+        self,
+        page: int = 1,
+        page_size: int = 20
+    ) -> Dict[str, Any]:
+        """Get paginated overall leaderboard."""
+        try:
+            cache_key = f"leaderboard_overall_page_{page}_size_{page_size}"
+            
+            cached_result = self._get_cached_result(cache_key)
+            if cached_result:
+                return cached_result
+            
+            offset = (page - 1) * page_size
+            
+            query = (
+                select(
+                    UserAward.user_id,
+                    User.username,
+                    func.count(UserAward.id).label("award_count"),
+                    func.sum(
+                        func.coalesce(
+                            func.json_extract(AwardTemplate.award_metadata, "$.points"),
+                            0
+                        )
+                    ).label("total_points"),
+                    func.max(UserAward.granted_at).label("latest_award")
+                )
+                .join(AwardTemplate, UserAward.template_id == AwardTemplate.id)
+                .join(User, UserAward.user_id == User.id)
+                .where(User.is_active == True)
+                .group_by(UserAward.user_id, User.username)
+                .order_by(
+                    desc("total_points"),
+                    desc("award_count"),
+                    desc("latest_award")
+                )
+            )
+            
+            count_query = select(func.count(func.distinct(UserAward.user_id))).select_from(query.subquery())
+            total = self.db.exec(count_query).first() or 0
+            
+            results = self.db.exec(query.offset(offset).limit(page_size)).all()
+            
+            leaderboard = []
+            base_rank = offset + 1
+            for i, (user_id, username, award_count, total_points, latest_award) in enumerate(results):
+                entry = {
+                    "rank": base_rank + i,
+                    "user_id": user_id,
+                    "username": username,
+                    "award_count": int(award_count or 0),
+                    "total_points": int(total_points or 0)
+                }
+                leaderboard.append(entry)
+            
+            result = {
+                "items": leaderboard,
+                "pagination": {
+                    "page": page,
+                    "page_size": page_size,
+                    "total": total,
+                    "total_pages": (total + page_size - 1) // page_size
+                }
+            }
+            
+            self._cache_result(cache_key, result)
+            return result
+            
+        except Exception as e:
+            logger.error(f"Failed to get paginated overall leaderboard: {e}")
+            raise LeaderboardServiceError(f"Failed to get paginated leaderboard: {e}")

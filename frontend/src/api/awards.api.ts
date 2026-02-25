@@ -19,9 +19,19 @@ interface GetAwardsParams {
   limit?: number;
 }
 
+export interface PaginatedResponse<T> {
+  items: T[];
+  pagination: {
+    page: number;
+    page_size: number;
+    total: number;
+    total_pages: number;
+  };
+}
+
 interface GetLeaderboardParams {
-  limit?: number;
-  include_ties?: boolean;
+  page?: number;
+  page_size?: number;
 }
 
 export const awardsApi = {
@@ -47,24 +57,24 @@ export const awardsApi = {
     return response.data;
   },
   
-  // Get leaderboard by category
+  // Get leaderboard by category (paginated)
   getLeaderboard: async (
     category: AwardCategory,
     params?: GetLeaderboardParams
-  ): Promise<LeaderboardEntrySchema[]> => {
+  ): Promise<PaginatedResponse<LeaderboardEntrySchema>> => {
     const queryParams = new URLSearchParams();
-    if (params?.limit !== undefined) queryParams.append('limit', params.limit.toString());
-    if (params?.include_ties !== undefined) queryParams.append('include_ties', params.include_ties.toString());
+    if (params?.page !== undefined) queryParams.append('page', params.page.toString());
+    if (params?.page_size !== undefined) queryParams.append('page_size', params.page_size.toString());
     
     const response = await apiClient.get(`/awards/leaderboard/${category}?${queryParams.toString()}`);
     return response.data;
   },
   
-  // Get overall leaderboard
-  getOverallLeaderboard: async (params?: GetLeaderboardParams): Promise<LeaderboardEntrySchema[]> => {
+  // Get overall leaderboard (paginated)
+  getOverallLeaderboard: async (params?: GetLeaderboardParams): Promise<PaginatedResponse<LeaderboardEntrySchema>> => {
     const queryParams = new URLSearchParams();
-    if (params?.limit !== undefined) queryParams.append('limit', params.limit.toString());
-    if (params?.include_ties !== undefined) queryParams.append('include_ties', params.include_ties.toString());
+    if (params?.page !== undefined) queryParams.append('page', params.page.toString());
+    if (params?.page_size !== undefined) queryParams.append('page_size', params.page_size.toString());
     
     const response = await apiClient.get(`/awards/leaderboard/overall?${queryParams.toString()}`);
     return response.data;

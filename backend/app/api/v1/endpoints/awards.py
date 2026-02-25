@@ -12,7 +12,6 @@ from app.models.user import User
 from app.models.award import AwardCategory
 from app.services.award_service import AwardService, AwardServiceError
 from app.services.leaderboard_service import LeaderboardService, LeaderboardServiceError
-from app.services.notification_service import NotificationService, NotificationServiceError
 from app.schemas.award import (
     UserAwardSchema,
     AvailableAwardSchema,
@@ -152,45 +151,33 @@ async def get_available_awards(
         )
 
 
-@router.get("/leaderboard/{category}", response_model=List[LeaderboardEntrySchema])
+@router.get("/leaderboard/{category}")
 async def get_leaderboard(
     category: AwardCategory,
-    limit: int = Query(50, ge=1, le=100, description="Maximum number of users to return"),
-    include_ties: bool = Query(True, description="Include tied users beyond limit"),
+    page: int = Query(1, ge=1, description="Page number (1-based)"),
+    page_size: int = Query(20, ge=1, le=100, description="Number of items per page"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_session)
 ):
     """
-    Get leaderboard rankings for a specific award category.
+    Get leaderboard rankings for a specific award category with pagination.
     
-    Returns top users ranked by total points earned in the specified category.
-    Uses caching for improved performance.
+    Returns users ranked by total points earned in the specified category.
+    Supports MUI-style pagination with page and page_size parameters.
     
     - **category**: Award category to rank by
-    - **limit**: Maximum number of users to return (1-100)
-    - **include_ties**: Whether to include tied users beyond the limit
+    - **page**: Page number (1-based)
+    - **page_size**: Number of items per page (1-100)
     """
     try:
         leaderboard_service = LeaderboardService(db)
-        leaderboard_data = await leaderboard_service.get_category_leaderboard(
+        result = await leaderboard_service.get_category_leaderboard_paginated(
             category=category,
-            limit=limit,
-            include_ties=include_ties
+            page=page,
+            page_size=page_size
         )
         
-        # Convert to response schema
-        leaderboard = []
-        for entry_data in leaderboard_data:
-            entry_schema = LeaderboardEntrySchema(
-                rank=entry_data["rank"],
-                user_id=entry_data["user_id"],
-                username=entry_data["username"],
-                award_count=entry_data["award_count"],
-                total_points=entry_data["total_points"]
-            )
-            leaderboard.append(entry_schema)
-        
-        return leaderboard
+        return result
         
     except LeaderboardServiceError as e:
         raise HTTPException(
@@ -229,22 +216,13 @@ async def get_user_awards(
     - **limit**: Maximum number of records to return
     """
     try:
-        # Check if user is viewing their own awards
-        if user_id != current_user.id:
-            # Check if target user has public profile enabled
-            from sqlmodel import select
-            target_user = db.exec(select(User).where(User.id == user_id)).first()
-            if not target_user:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="User not found"
-                )
-            
-            if not target_user.public_profile:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail="User's profile is private"
-                )
+        from sqlmodel import select
+        target_user = db.exec(select(User).where(User.id == user_id)).first()
+        if not target_user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
         
         award_service = AwardService(db)
         awards_data = await award_service.get_user_awards(
@@ -298,42 +276,30 @@ async def get_user_awards(
         )
 
 
-@router.get("/leaderboard/overall", response_model=List[LeaderboardEntrySchema])
+@router.get("/leaderboard/overall")
 async def get_overall_leaderboard(
-    limit: int = Query(50, ge=1, le=100, description="Maximum number of users to return"),
-    include_ties: bool = Query(True, description="Include tied users beyond limit"),
+    page: int = Query(1, ge=1, description="Page number (1-based)"),
+    page_size: int = Query(20, ge=1, le=100, description="Number of items per page"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_session)
 ):
     """
-    Get overall leaderboard rankings across all award categories.
+    Get overall leaderboard rankings across all award categories with pagination.
     
-    Returns top users ranked by total points earned across all categories.
-    Uses caching for improved performance.
+    Returns users ranked by total points earned across all categories.
+    Supports MUI-style pagination with page and page_size parameters.
     
-    - **limit**: Maximum number of users to return (1-100)
-    - **include_ties**: Whether to include tied users beyond the limit
+    - **page**: Page number (1-based)
+    - **page_size**: Number of items per page (1-100)
     """
     try:
         leaderboard_service = LeaderboardService(db)
-        leaderboard_data = await leaderboard_service.get_overall_leaderboard(
-            limit=limit,
-            include_ties=include_ties
+        result = await leaderboard_service.get_overall_leaderboard_paginated(
+            page=page,
+            page_size=page_size
         )
         
-        # Convert to response schema
-        leaderboard = []
-        for entry_data in leaderboard_data:
-            entry_schema = LeaderboardEntrySchema(
-                rank=entry_data["rank"],
-                user_id=entry_data["user_id"],
-                username=entry_data["username"],
-                award_count=entry_data["award_count"],
-                total_points=entry_data["total_points"]
-            )
-            leaderboard.append(entry_schema)
-        
-        return leaderboard
+        return result
         
     except LeaderboardServiceError as e:
         raise HTTPException(
@@ -475,8 +441,8 @@ async def get_dashboard_stats(
     Returns statistics about user's awards, progress, and achievements.
     """
     try:
-        notification_service = NotificationService(db)
-        stats = await notification_service.get_dashboard_stats(current_user.id)
+        award_service = AwardService(db)
+        stats = await award_service.get_dashboard_stats(current_user.id)
         
         return DashboardStatsSchema(
             user_id=current_user.id,
@@ -484,7 +450,7 @@ async def get_dashboard_stats(
             dashboard_stats=stats
         )
         
-    except NotificationServiceError as e:
+    except AwardServiceError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve dashboard stats: {str(e)}"
@@ -509,7 +475,7 @@ async def get_recent_awards(
     Returns awards earned within the specified timeframe.
     """
     try:
-        notification_service = NotificationService(db)
+        notification_service = AwardService(db)
         recent_awards = await notification_service.get_recent_awards(
             user_id=current_user.id,
             limit=limit,
@@ -523,7 +489,7 @@ async def get_recent_awards(
             total_count=len(recent_awards)
         )
         
-    except NotificationServiceError as e:
+    except AwardServiceError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve recent awards: {str(e)}"
@@ -546,7 +512,7 @@ async def get_award_progress(
     Returns progress information including category breakdowns and next milestones.
     """
     try:
-        notification_service = NotificationService(db)
+        notification_service = AwardService(db)
         progress = await notification_service.get_award_progress(current_user.id)
         
         return AwardProgressSchema(
@@ -554,7 +520,7 @@ async def get_award_progress(
             progress=progress
         )
         
-    except NotificationServiceError as e:
+    except AwardServiceError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve award progress: {str(e)}"
@@ -578,7 +544,7 @@ async def get_award_notifications(
     Returns notifications about recent awards and achievements.
     """
     try:
-        notification_service = NotificationService(db)
+        notification_service = AwardService(db)
         notifications = await notification_service.get_award_notifications(
             user_id=current_user.id,
             unread_only=unread_only
@@ -591,7 +557,7 @@ async def get_award_notifications(
             total_count=len(notifications)
         )
         
-    except NotificationServiceError as e:
+    except AwardServiceError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve notifications: {str(e)}"
@@ -615,7 +581,7 @@ async def mark_notifications_read(
     Accepts a list of notification IDs to mark as read.
     """
     try:
-        notification_service = NotificationService(db)
+        notification_service = AwardService(db)
         success = await notification_service.mark_notifications_read(
             user_id=current_user.id,
             notification_ids=request.notification_ids
@@ -627,7 +593,7 @@ async def mark_notifications_read(
             message=f"Marked {len(request.notification_ids)} notifications as read"
         )
         
-    except NotificationServiceError as e:
+    except AwardServiceError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to mark notifications as read: {str(e)}"

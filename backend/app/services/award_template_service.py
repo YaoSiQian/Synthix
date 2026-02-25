@@ -207,15 +207,14 @@ class AwardTemplateService:
         criteria_type = criteria["type"]
         valid_types = [
             "discovery_count", "unique_effects", "reaction_complexity",
-            "debug_submissions", "correction_accuracy", "data_quality_impact",
-            "profile_completeness", "consecutive_days", "help_others"
+            "profile_completeness", "consecutive_days"
         ]
         
         if criteria_type not in valid_types:
             raise AwardTemplateValidationError(f"Invalid criteria type: {criteria_type}")
         
         # Validate threshold for count-based criteria
-        if criteria_type in ["discovery_count", "debug_submissions", "consecutive_days"]:
+        if criteria_type in ["discovery_count", "consecutive_days"]:
             if "threshold" not in criteria:
                 raise AwardTemplateValidationError(f"Criteria type '{criteria_type}' requires a 'threshold' field")
             
