@@ -119,7 +119,56 @@ class AwardService:
         except Exception as e:
             logger.error(f"Discovery award evaluation failed for user {user_id}: {e}")
             raise AwardServiceError(f"Discovery award evaluation failed: {e}")
-    
+
+    async def evaluate_all_awards(
+        self,
+        user_id: int,
+        context: Optional[Dict[str, Any]] = None
+    ) -> List[UserAward]:
+        try:
+            templates = await self.template_service.get_templates(
+                active_only=True
+            )
+
+            granted_awards = []
+            evaluation_context = context or {}
+
+            for template in templates:
+                try:
+                    existing_award = await self._get_user_award(user_id, template.id)
+
+                    if existing_award:
+                        criteria_met = await self.evaluator.check_criteria(
+                            template, user_id, evaluation_context
+                        )
+                        if criteria_met:
+                            upgraded_award = await self._check_tier_upgrade(
+                                existing_award, template, user_id, evaluation_context
+                            )
+                            if upgraded_award:
+                                granted_awards.append(upgraded_award)
+                    else:
+                        criteria_met = await self.evaluator.check_criteria(
+                            template, user_id, evaluation_context
+                        )
+                        if criteria_met:
+                            new_award = await self.grant_award(
+                                user_id, template.id, evaluation_context
+                            )
+                            granted_awards.append(new_award)
+
+                except Exception as e:
+                    logger.warning(
+                        f"Failed to evaluate template {template.id} for user {user_id}: {e}"
+                    )
+                    continue
+
+            return granted_awards
+
+        except Exception as e:
+            logger.error(f"Award evaluation failed for user {user_id}: {e}")
+            raise AwardServiceError(f"Award evaluation failed: {e}")
+
     async def grant_award(
         self, 
         user_id: int, 

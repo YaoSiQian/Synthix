@@ -208,9 +208,8 @@ class ReactionService:
             }
             
             # Evaluate discovery awards
-            granted_awards = await award_service.evaluate_discovery_awards(
+            granted_awards = await award_service.evaluate_all_awards(
                 user_id=user_id,
-                reaction_cache_id=reaction_cache_id,
                 context=context
             )
             
