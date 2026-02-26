@@ -291,6 +291,178 @@ AWARD_TEMPLATES = [
                 {"name": "Safety Master", "threshold": 1.0, "points": 150}
             ]
         }
+    },
+
+    {
+        "name": "Element Explorer",
+        "description": "Awarded for discovering reactions with different chemical elements",
+        "category": AwardCategory.ACHIEVEMENT,
+        "criteria": {
+            "type": "unique_elements",
+            "threshold": 10
+        },
+        "metadata": {
+            "icon": "⚛️",
+            "rarity": "uncommon",
+            "points": 35,
+            "tiers": [
+                {"name": "Element Scout", "threshold": 10, "points": 35},
+                {"name": "Element Specialist", "threshold": 25, "points": 80},
+                {"name": "Element Master", "threshold": 50, "points": 175}
+            ]
+        }
+    },
+    {
+        "name": "Periodic Pro",
+        "description": "Awarded for mastering the periodic table through experiments",
+        "category": AwardCategory.ACHIEVEMENT,
+        "criteria": {
+            "type": "unique_elements",
+            "threshold": 50
+        },
+        "metadata": {
+            "icon": "🧬",
+            "rarity": "legendary",
+            "points": 150,
+            "tiers": [
+                {"name": "Periodic Scholar", "threshold": 50, "points": 150},
+                {"name": "Table Guardian", "threshold": 75, "points": 300},
+                {"name": "Element Sage", "threshold": 100, "points": 500}
+            ]
+        }
+    },
+    {
+        "name": "Reaction Typer",
+        "description": "Awarded for discovering different types of chemical reactions",
+        "category": AwardCategory.ACHIEVEMENT,
+        "criteria": {
+            "type": "unique_reaction_types",
+            "threshold": 3
+        },
+        "metadata": {
+            "icon": "🔀",
+            "rarity": "uncommon",
+            "points": 30,
+            "tiers": [
+                {"name": "Type Seeker", "threshold": 3, "points": 30},
+                {"name": "Reaction Classifier", "threshold": 5, "points": 70},
+                {"name": "Type Master", "threshold": 8, "points": 150}
+            ]
+        }
+    },
+    {
+        "name": "Heat Hunter",
+        "description": "Awarded for discovering exothermic reactions",
+        "category": AwardCategory.ACHIEVEMENT,
+        "criteria": {
+            "type": "exothermic_reactions",
+            "threshold": 5
+        },
+        "metadata": {
+            "icon": "🔥",
+            "rarity": "rare",
+            "points": 45,
+            "tiers": [
+                {"name": "Heat Seeker", "threshold": 5, "points": 45},
+                {"name": "Thermal Expert", "threshold": 15, "points": 100},
+                {"name": "Heat Master", "threshold": 30, "points": 225}
+            ]
+        }
+    },
+    {
+        "name": "Cold Seeker",
+        "description": "Awarded for discovering endothermic reactions",
+        "category": AwardCategory.ACHIEVEMENT,
+        "criteria": {
+            "type": "endothermic_reactions",
+            "threshold": 3
+        },
+        "metadata": {
+            "icon": "❄️",
+            "rarity": "rare",
+            "points": 40,
+            "tiers": [
+                {"name": "Cold Explorer", "threshold": 3, "points": 40},
+                {"name": "Cool Chemist", "threshold": 10, "points": 90},
+                {"name": "Frost Master", "threshold": 20, "points": 200}
+            ]
+        }
+    },
+    {
+        "name": "Acid Base Expert",
+        "description": "Awarded for discovering acid-base neutralization reactions",
+        "category": AwardCategory.ACHIEVEMENT,
+        "criteria": {
+            "type": "acid_base_reactions",
+            "threshold": 5
+        },
+        "metadata": {
+            "icon": "🧪",
+            "rarity": "rare",
+            "points": 50,
+            "tiers": [
+                {"name": "pH Explorer", "threshold": 5, "points": 50},
+                {"name": "Neutralization Pro", "threshold": 15, "points": 120},
+                {"name": "Acid Base Master", "threshold": 30, "points": 275}
+            ]
+        }
+    },
+    {
+        "name": "Redox Specialist",
+        "description": "Awarded for discovering oxidation-reduction reactions",
+        "category": AwardCategory.ACHIEVEMENT,
+        "criteria": {
+            "type": "redox_reactions",
+            "threshold": 5
+        },
+        "metadata": {
+            "icon": "⚡",
+            "rarity": "epic",
+            "points": 65,
+            "tiers": [
+                {"name": "Electron Trader", "threshold": 5, "points": 65},
+                {"name": "Oxidation Expert", "threshold": 15, "points": 150},
+                {"name": "Redox Master", "threshold": 30, "points": 350}
+            ]
+        }
+    },
+    {
+        "name": "Gas Producer",
+        "description": "Awarded for discovering reactions that produce gas",
+        "category": AwardCategory.ACHIEVEMENT,
+        "criteria": {
+            "type": "gas_production",
+            "threshold": 5
+        },
+        "metadata": {
+            "icon": "💨",
+            "rarity": "uncommon",
+            "points": 30,
+            "tiers": [
+                {"name": "Bubbler", "threshold": 5, "points": 30},
+                {"name": "Gas Expert", "threshold": 15, "points": 75},
+                {"name": "Effervescence Master", "threshold": 30, "points": 175}
+            ]
+        }
+    },
+    {
+        "name": "Catalyst Discoverer",
+        "description": "Awarded for discovering reactions involving catalysts",
+        "category": AwardCategory.ACHIEVEMENT,
+        "criteria": {
+            "type": "catalyst_reactions",
+            "threshold": 3
+        },
+        "metadata": {
+            "icon": "🔱",
+            "rarity": "epic",
+            "points": 70,
+            "tiers": [
+                {"name": "Catalyst Finder", "threshold": 3, "points": 70},
+                {"name": "Catalysis Expert", "threshold": 10, "points": 175},
+                {"name": "Catalyst Master", "threshold": 25, "points": 400}
+            ]
+        }
     }
 ]
 

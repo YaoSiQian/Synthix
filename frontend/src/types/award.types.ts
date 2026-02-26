@@ -105,3 +105,19 @@ export const tierLabels: Record<number, string> = {
   2: '白银',
   3: '黄金',
 };
+
+export const rarityColors: Record<string, string> = {
+  common: '#9ca3af',    // Gray
+  uncommon: '#22c55e', // Green
+  rare: '#3b82f6',      // Blue
+  epic: '#a855f7',     // Purple
+  legendary: '#f59e0b', // Orange/Gold
+};
+
+export const rarityLabels: Record<string, string> = {
+  common: '普通',
+  uncommon: '稀有',
+  rare: '罕见',
+  epic: '史诗',
+  legendary: '传说',
+};

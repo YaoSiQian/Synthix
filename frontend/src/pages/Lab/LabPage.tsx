@@ -344,7 +344,7 @@ const LabPage: React.FC = () => {
                   icon={<Science sx={{ fontSize: 48, color: colors.onSurfaceVariant }} />}
                 />
               ) : (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, maxHeight: 400, overflow: 'auto' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                   {chemicals.map((chemical) => (
                     <ChemicalCard
                       key={chemical.id}

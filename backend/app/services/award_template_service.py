@@ -207,7 +207,10 @@ class AwardTemplateService:
         criteria_type = criteria["type"]
         valid_types = [
             "discovery_count", "unique_effects", "reaction_complexity",
-            "profile_completeness", "consecutive_days"
+            "profile_completeness", "consecutive_days", "unique_elements",
+            "unique_reaction_types", "exothermic_reactions", "endothermic_reactions",
+            "acid_base_reactions", "redox_reactions", "gas_production", "catalyst_reactions",
+            "special_event", "special_recognition", "safety_score", "help_others"
         ]
         
         if criteria_type not in valid_types:

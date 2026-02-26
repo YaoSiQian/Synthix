@@ -4,6 +4,7 @@ Award Evaluation Engine
 Handles criteria checking, tier calculation, and progress tracking for awards.
 """
 
+import re
 from typing import Dict, Any, List, Optional, Tuple
 from sqlmodel import Session, select, func, desc
 from datetime import datetime, timedelta
@@ -11,6 +12,32 @@ from datetime import datetime, timedelta
 from app.models.award import AwardTemplate, UserAward, AwardCategory
 from app.models.reaction import ReactionCache, Discovery
 from app.models.user import User
+
+ELEMENT_PATTERN = re.compile(r'([A-Z][a-z]?)(\d*)')
+
+COMMON_ELEMENTS = {
+    'H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne',
+    'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'K', 'Ca',
+    'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn',
+    'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr', 'Rb', 'Sr', 'Y', 'Zr',
+    'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd', 'In', 'Sn',
+    'Sb', 'Te', 'I', 'Xe', 'Cs', 'Ba', 'La', 'Ce', 'Pt', 'Au',
+    'Hg', 'Tl', 'Pb', 'Bi', 'Po', 'At', 'Rn', 'Fr', 'Ra', 'Ac'
+}
+
+REACTION_TYPE_KEYWORDS = {
+    'combustion': ['combustion', 'burn', 'oxidize', 'oxidation'],
+    'synthesis': ['synthesis', 'combine', 'form', 'produce'],
+    'decomposition': ['decompose', 'break', 'split', 'dissociate'],
+    'single_replacement': ['single', 'replacement', 'displace'],
+    'double_replacement': ['double', 'replacement', 'exchange'],
+    'acid_base': ['acid', 'base', 'neutralize', 'salt', 'hydroxide', 'hydrogen'],
+    'precipitation': ['precipitate', 'insoluble', 'precipitate', 'settle'],
+    'redox': ['redox', 'oxidation', 'reduction', 'electron'],
+}
+
+EXOTHERMIC_KEYWORDS = ['exothermic', 'heat', 'release', 'fire', 'burn', 'glow', 'hot']
+ENDOTHERMIC_KEYWORDS = ['endothermic', 'absorb', 'cool', 'cold', 'heat']
 
 
 class AwardEvaluationError(Exception):
@@ -71,6 +98,22 @@ class AwardEvaluator:
             return await self._check_profile_completeness_criteria(criteria, user_stats)
         elif criteria_type == "consecutive_days":
             return await self._check_consecutive_days_criteria(criteria, user_stats)
+        elif criteria_type == "unique_elements":
+            return await self._check_unique_elements_criteria(criteria, user_stats)
+        elif criteria_type == "unique_reaction_types":
+            return await self._check_unique_reaction_types_criteria(criteria, user_stats)
+        elif criteria_type == "exothermic_reactions":
+            return await self._check_thermal_reactions_criteria(criteria, user_stats, "exothermic")
+        elif criteria_type == "endothermic_reactions":
+            return await self._check_thermal_reactions_criteria(criteria, user_stats, "endothermic")
+        elif criteria_type == "acid_base_reactions":
+            return await self._check_reaction_type_by_keyword(criteria, user_stats, "acid_base")
+        elif criteria_type == "redox_reactions":
+            return await self._check_reaction_type_by_keyword(criteria, user_stats, "redox")
+        elif criteria_type == "gas_production":
+            return await self._check_gas_production_criteria(criteria, user_stats)
+        elif criteria_type == "catalyst_reactions":
+            return await self._check_catalyst_reactions_criteria(criteria, user_stats)
         else:
             raise AwardEvaluationError(f"Unknown criteria type: {criteria_type}")
     
@@ -145,6 +188,78 @@ class AwardEvaluator:
                 "percentage": completeness,
                 "is_complete": completeness >= target
             })
+        elif criteria_type == "unique_elements":
+            current = user_stats.get("unique_elements_count", 0)
+            target = criteria.get("threshold", 1)
+            progress.update({
+                "current_value": current,
+                "target_value": target,
+                "percentage": min(100.0, (current / target) * 100.0),
+                "is_complete": current >= target
+            })
+        elif criteria_type == "unique_reaction_types":
+            current = user_stats.get("unique_reaction_types_count", 0)
+            target = criteria.get("threshold", 1)
+            progress.update({
+                "current_value": current,
+                "target_value": target,
+                "percentage": min(100.0, (current / target) * 100.0),
+                "is_complete": current >= target
+            })
+        elif criteria_type == "exothermic_reactions":
+            current = user_stats.get("exothermic_count", 0)
+            target = criteria.get("threshold", 1)
+            progress.update({
+                "current_value": current,
+                "target_value": target,
+                "percentage": min(100.0, (current / target) * 100.0),
+                "is_complete": current >= target
+            })
+        elif criteria_type == "endothermic_reactions":
+            current = user_stats.get("endothermic_count", 0)
+            target = criteria.get("threshold", 1)
+            progress.update({
+                "current_value": current,
+                "target_value": target,
+                "percentage": min(100.0, (current / target) * 100.0),
+                "is_complete": current >= target
+            })
+        elif criteria_type == "acid_base_reactions":
+            current = user_stats.get("acid_base_count", 0)
+            target = criteria.get("threshold", 1)
+            progress.update({
+                "current_value": current,
+                "target_value": target,
+                "percentage": min(100.0, (current / target) * 100.0),
+                "is_complete": current >= target
+            })
+        elif criteria_type == "redox_reactions":
+            current = user_stats.get("redox_count", 0)
+            target = criteria.get("threshold", 1)
+            progress.update({
+                "current_value": current,
+                "target_value": target,
+                "percentage": min(100.0, (current / target) * 100.0),
+                "is_complete": current >= target
+            })
+        elif criteria_type == "gas_production":
+            current = user_stats.get("gas_reactions_count", 0)
+            target = criteria.get("threshold", 1)
+            progress.update({
+                "current_value": current,
+                "target_value": target,
+                "percentage": min(100.0, (current / target) * 100.0),
+                "is_complete": current >= target
+            })
+        elif criteria_type == "catalyst_reactions":
+            current = user_stats.get("catalyst_reactions_count", 0)
+            target = criteria.get("threshold", 1)
+            progress.update({
+                "current_value": current,
+                "target_value": target,
+                "percentage": min(100.0, (current / target) * 100.0),
+                "is_complete": current >= target
+            })
         
         return progress
     
@@ -180,6 +295,22 @@ class AwardEvaluator:
             stat_value = user_stats.get("accuracy_percentage", 0.0)
         elif criteria_type == "profile_completeness":
             stat_value = user_stats.get("completeness_percentage", 0.0)
+        elif criteria_type == "unique_elements":
+            stat_value = user_stats.get("unique_elements_count", 0)
+        elif criteria_type == "unique_reaction_types":
+            stat_value = user_stats.get("unique_reaction_types_count", 0)
+        elif criteria_type == "exothermic_reactions":
+            stat_value = user_stats.get("exothermic_count", 0)
+        elif criteria_type == "endothermic_reactions":
+            stat_value = user_stats.get("endothermic_count", 0)
+        elif criteria_type == "acid_base_reactions":
+            stat_value = user_stats.get("acid_base_count", 0)
+        elif criteria_type == "redox_reactions":
+            stat_value = user_stats.get("redox_count", 0)
+        elif criteria_type == "gas_production":
+            stat_value = user_stats.get("gas_reactions_count", 0)
+        elif criteria_type == "catalyst_reactions":
+            stat_value = user_stats.get("catalyst_reactions_count", 0)
         else:
             stat_value = user_stats.get("count", 0)
         
@@ -251,8 +382,31 @@ class AwardEvaluator:
             stats["count"] = consecutive_days
             
         elif criteria_type == "help_others":
-            # Placeholder for community help metrics
             stats["help_score"] = 0
+
+        elif criteria_type == "unique_elements":
+            stats["unique_elements_count"] = await self._count_unique_elements(user_id)
+
+        elif criteria_type == "unique_reaction_types":
+            stats["unique_reaction_types_count"] = await self._count_unique_reaction_types(user_id)
+
+        elif criteria_type == "exothermic_reactions":
+            stats["exothermic_count"] = await self._count_thermal_reactions(user_id, "exothermic")
+
+        elif criteria_type == "endothermic_reactions":
+            stats["endothermic_count"] = await self._count_thermal_reactions(user_id, "endothermic")
+
+        elif criteria_type == "acid_base_reactions":
+            stats["acid_base_count"] = await self._count_reactions_by_keyword(user_id, "acid_base")
+
+        elif criteria_type == "redox_reactions":
+            stats["redox_count"] = await self._count_reactions_by_keyword(user_id, "redox")
+
+        elif criteria_type == "gas_production":
+            stats["gas_reactions_count"] = await self._count_gas_production_reactions(user_id)
+
+        elif criteria_type == "catalyst_reactions":
+            stats["catalyst_reactions_count"] = await self._count_catalyst_reactions(user_id)
         
         return stats
     
@@ -384,3 +538,191 @@ class AwardEvaluator:
                 break
         
         return consecutive_days
+
+    async def _check_unique_elements_criteria(
+        self,
+        criteria: Dict[str, Any],
+        user_stats: Dict[str, Any]
+    ) -> bool:
+        """Check unique elements criteria."""
+        threshold = criteria.get("threshold", 1)
+        current_count = user_stats.get("unique_elements_count", 0)
+        return current_count >= threshold
+
+    async def _check_unique_reaction_types_criteria(
+        self,
+        criteria: Dict[str, Any],
+        user_stats: Dict[str, Any]
+    ) -> bool:
+        """Check unique reaction types criteria."""
+        threshold = criteria.get("threshold", 1)
+        current_count = user_stats.get("unique_reaction_types_count", 0)
+        return current_count >= threshold
+
+    async def _check_thermal_reactions_criteria(
+        self,
+        criteria: Dict[str, Any],
+        user_stats: Dict[str, Any],
+        thermal_type: str
+    ) -> bool:
+        """Check exothermic or endothermic reaction criteria."""
+        threshold = criteria.get("threshold", 1)
+        if thermal_type == "exothermic":
+            count = user_stats.get("exothermic_count", 0)
+        else:
+            count = user_stats.get("endothermic_count", 0)
+        return count >= threshold
+
+    async def _check_reaction_type_by_keyword(
+        self,
+        criteria: Dict[str, Any],
+        user_stats: Dict[str, Any],
+        reaction_type: str
+    ) -> bool:
+        """Check reaction type criteria by keyword matching."""
+        threshold = criteria.get("threshold", 1)
+        if reaction_type == "acid_base":
+            count = user_stats.get("acid_base_count", 0)
+        elif reaction_type == "redox":
+            count = user_stats.get("redox_count", 0)
+        else:
+            count = 0
+        return count >= threshold
+
+    async def _check_gas_production_criteria(
+        self,
+        criteria: Dict[str, Any],
+        user_stats: Dict[str, Any]
+    ) -> bool:
+        """Check gas production reaction criteria."""
+        threshold = criteria.get("threshold", 1)
+        count = user_stats.get("gas_reactions_count", 0)
+        return count >= threshold
+
+    async def _check_catalyst_reactions_criteria(
+        self,
+        criteria: Dict[str, Any],
+        user_stats: Dict[str, Any]
+    ) -> bool:
+        """Check catalyst reaction criteria."""
+        threshold = criteria.get("threshold", 1)
+        count = user_stats.get("catalyst_reactions_count", 0)
+        return count >= threshold
+
+    def _parse_elements_from_formula(self, formula: str) -> set:
+        """Parse chemical formula and extract unique elements."""
+        elements = set()
+        matches = ELEMENT_PATTERN.findall(formula)
+        for element, count in matches:
+            if element and element in COMMON_ELEMENTS:
+                elements.add(element)
+        return elements
+
+    async def _count_unique_elements(self, user_id: int) -> int:
+        """Count unique chemical elements used by user in reactions."""
+        reactions = self.db.exec(
+            select(ReactionCache.reactants, ReactionCache.products)
+            .where(ReactionCache.user_id == user_id)
+        ).all()
+
+        all_elements = set()
+        for reactants, products in reactions:
+            if reactants:
+                for formula in reactants:
+                    all_elements.update(self._parse_elements_from_formula(formula))
+            if products:
+                for product in products:
+                    if isinstance(product, dict) and "formula" in product:
+                        all_elements.update(self._parse_elements_from_formula(product["formula"]))
+
+        return len(all_elements)
+
+    async def _count_unique_reaction_types(self, user_id: int) -> int:
+        """Count unique reaction types discovered by user."""
+        reactions = self.db.exec(
+            select(ReactionCache.explanation)
+            .where(ReactionCache.user_id == user_id)
+        ).all()
+
+        discovered_types = set()
+        for explanation in reactions:
+            if not explanation:
+                continue
+            explanation_lower = explanation.lower()
+            for reaction_type, keywords in REACTION_TYPE_KEYWORDS.items():
+                if any(keyword in explanation_lower for keyword in keywords):
+                    discovered_types.add(reaction_type)
+
+        return len(discovered_types)
+
+    async def _count_thermal_reactions(self, user_id: int, thermal_type: str) -> int:
+        """Count exothermic or endothermic reactions."""
+        reactions = self.db.exec(
+            select(ReactionCache.effects, ReactionCache.explanation)
+            .where(ReactionCache.user_id == user_id)
+        ).all()
+
+        count = 0
+        keywords = EXOTHERMIC_KEYWORDS if thermal_type == "exothermic" else ENDOTHERMIC_KEYWORDS
+
+        for effects, explanation in reactions:
+            if effects and any(keyword in str(effects).lower() for keyword in keywords):
+                count += 1
+            elif explanation and any(keyword in explanation.lower() for keyword in keywords):
+                count += 1
+
+        return count
+
+    async def _count_reactions_by_keyword(self, user_id: int, reaction_type: str) -> int:
+        """Count reactions matching specific type keywords."""
+        reactions = self.db.exec(
+            select(ReactionCache.explanation, ReactionCache.effects)
+            .where(ReactionCache.user_id == user_id)
+        ).all()
+
+        count = 0
+        keywords = REACTION_TYPE_KEYWORDS.get(reaction_type, [])
+
+        for explanation, effects in reactions:
+            text_to_check = ""
+            if explanation:
+                text_to_check += explanation.lower() + " "
+            if effects:
+                text_to_check += str(effects).lower()
+
+            if any(keyword in text_to_check for keyword in keywords):
+                count += 1
+
+        return count
+
+    async def _count_gas_production_reactions(self, user_id: int) -> int:
+        """Count reactions that produce gas."""
+        reactions = self.db.exec(
+            select(ReactionCache.effects)
+            .where(ReactionCache.user_id == user_id)
+        ).all()
+
+        count = 0
+        gas_keywords = ["gas", "bubble", "effervescence", "fizzle", "hydrogen", "oxygen", "carbon dioxide", "nitrogen"]
+
+        for effects in reactions:
+            if effects and any(keyword in str(effects).lower() for keyword in gas_keywords):
+                count += 1
+
+        return count
+
+    async def _count_catalyst_reactions(self, user_id: int) -> int:
+        """Count reactions involving catalysts."""
+        reactions = self.db.exec(
+            select(ReactionCache.environment)
+            .where(ReactionCache.user_id == user_id)
+        ).all()
+
+        catalyst_keywords = ["catalyst", "catalyze", "catalytic", "catalysis"]
+
+        count = 0
+        for environment in reactions:
+            if environment and any(keyword in environment.lower() for keyword in catalyst_keywords):
+                count += 1
+
+        return count
