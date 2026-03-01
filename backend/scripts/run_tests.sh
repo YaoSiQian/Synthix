@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Main test runner script for Chemezy API testing
+# Main test runner script for Synthix API testing
 # Usage: ./scripts/run_tests.sh [suite] [--verbose] [--skip-db-reset]
 # 
 # Features:
@@ -179,7 +179,7 @@ run_test_suite() {
 # Main execution
 main() {
     echo "=========================================="
-    echo "  Chemezy API Test Suite"
+    echo "  Synthix API Test Suite"
     echo "=========================================="
     echo ""
     

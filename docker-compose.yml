@@ -24,7 +24,7 @@ services:
       - ALLOWED_ORIGINS=["http://localhost:3000","https://yourdomain.com"]
       - PUBCHEM_BASE_URL=https://pubchem.ncbi.nlm.nih.gov/rest/pug
       - PUBCHEM_TIMEOUT=10
-      - APP_NAME=Chemezy Backend Engine
+      - APP_NAME=Synthix Backend Engine
       - DEBUG=false
       - OPENAI_API_KEY=fastgpt-cCTUY9TZh1ZUAcNv2dCnnnyB6J8BuEyjqTveeB18ehkXNYq59LaFzwcZQ
       - OPENAI_API_BASE=https://cloud.fastgpt.io/api/v1

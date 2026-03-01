@@ -16,7 +16,7 @@ limiter = Limiter(key_func=get_remote_address)
 # Create FastAPI app
 app = FastAPI(
     title=settings.app_name,
-    description="The source code of reality for the Chemezy game universe",
+    description="The source code of reality for the Synthix game universe",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",

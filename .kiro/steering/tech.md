@@ -1,4 +1,4 @@
-# Chemezy Backend Technology Stack
+# Synthix Backend Technology Stack
 
 ## Core Framework
 - **FastAPI**: Modern Python web framework with automatic OpenAPI documentation

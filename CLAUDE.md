@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Context and Architecture
 
-Chemezy is a gamified chemistry simulation platform that serves as "the source code of reality" for chemistry education. The backend combines AI-powered reaction prediction with real scientific data from PubChem and a comprehensive gamification system.
+Synthix is a gamified chemistry simulation platform that serves as "the source code of reality" for chemistry education. The backend combines AI-powered reaction prediction with real scientific data from PubChem and a comprehensive gamification system.
 
 ### Core Architecture Pattern
 The project follows a **layered service architecture** with strict separation of concerns:

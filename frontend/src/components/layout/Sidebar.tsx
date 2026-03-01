@@ -58,7 +58,7 @@ export const Sidebar: React.FC = () => {
         }}
       >
         <Typography variant="h6" sx={{ fontWeight: 600, color: colors.onSurface }}>
-          Chemezy
+          Synthix
         </Typography>
         <IconButton onClick={() => setSidebarOpen(false)}>
           <Close />
@@ -109,7 +109,7 @@ export const Sidebar: React.FC = () => {
       {/* Footer */}
       <Box sx={{ p: 2, borderTop: `1px solid ${colors.outlineVariant}` }}>
         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center' }}>
-          Chemezy v1.0
+          Synthix v1.0
         </Typography>
       </Box>
     </Box>

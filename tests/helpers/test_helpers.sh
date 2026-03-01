@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Test helper functions for Chemezy API testing
+# Test helper functions for Synthix API testing
 # Note: Database is automatically reset before tests unless --skip-db-reset flag is used
 
 # Colors for output

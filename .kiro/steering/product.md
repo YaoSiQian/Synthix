@@ -1,9 +1,9 @@
-# Chemezy Backend Product Overview
+# Synthix Backend Product Overview
 
-Chemezy is a gamified chemistry simulation platform that combines real scientific data with AI-powered reaction prediction and a comprehensive award system.
+Synthix is a gamified chemistry simulation platform that combines real scientific data with AI-powered reaction prediction and a comprehensive award system.
 
 ## Core Purpose
-The backend serves as "the source code of reality" for the Chemezy game universe, providing:
+The backend serves as "the source code of reality" for the Synthix game universe, providing:
 - **Chemistry Engine**: AI-powered chemical reaction simulation using real PubChem data
 - **Award System**: Comprehensive gamification with discovery tracking, leaderboards, and achievements
 - **User Management**: Authentication, profiles, and community features

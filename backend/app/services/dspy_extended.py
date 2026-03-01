@@ -1,7 +1,7 @@
 """Chemistry-focused DSPy extensions for structured reasoning and output formatting.
 
 This module provides enhanced DSPy components specifically tailored for chemistry education
-and chemical reasoning tasks in the Chemezy application.
+and chemical reasoning tasks in the Synthix application.
 """
 
 import json

@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Database settings
-    database_url: str = "sqlite:///./chemezy.db"
+    database_url: str = "sqlite:///./synthix.db"
 
     dspy_enabled: bool = True
 
@@ -30,7 +30,7 @@ class Settings(BaseSettings):
 
 
     # Application settings
-    app_name: str = "Chemezy Backend Engine"
+    app_name: str = "Synthix Backend Engine"
     debug: bool = False
     testing: bool = False
 

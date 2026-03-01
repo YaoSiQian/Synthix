@@ -1,4 +1,4 @@
-# Chemezy Backend Project Structure
+# Synthix Backend Project Structure
 
 ## Architecture Pattern
 The project follows a **layered service architecture** with clear separation of concerns:

@@ -108,7 +108,7 @@ export const Header: React.FC = () => {
               display: { xs: 'none', sm: 'block' },
             }}
           >
-            Chemezy
+            Synthix
           </Typography>
         </Box>
         
